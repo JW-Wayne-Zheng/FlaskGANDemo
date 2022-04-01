@@ -1,16 +1,14 @@
 from flask import Flask, render_template
-# import tensorflow as tf
-# from tensorflow import keras
-# from tensorflow.keras.models import load_model
-# from tensorflow.keras.preprocessing import image
+from tensorflow import keras
+import tensorflow_addons as tfa
 from bs4 import BeautifulSoup
 
 
 soup = BeautifulSoup("templates/index.html")
 
-# model = load_model("models/monet_generator.h5")
+model = keras.models.load_model("models/monet_generator.h5", custom_objects={"InstanceNormalization":tfa.layers.InstanceNormalization})
 
-# print(model.summary())
+print(model.summary())
 
 
 app = Flask(__name__)
