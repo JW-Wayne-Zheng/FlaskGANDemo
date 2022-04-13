@@ -12,7 +12,6 @@ import cv2
 import tensorflow as tf
 import PIL
 import numpy as np
-import generator
 
 soup = BeautifulSoup("templates/index.html")
 
@@ -38,21 +37,8 @@ image_tar = model_AtoB.predict(image_src)
 image_tar = (image_tar + 1) / 2.0
 # plot the translated image
 pyplot.imshow(image_tar[0])
-pyplot.savefig('output.jpg')
-pyplot.show()
-
-
-# model = generator.generator_fn()
-# model.load_weights("models/monet_generator.h5")
-# model = load_model("models/monet_generator.h5", custom_objects={"InstanceNormalization":tfa.layers.InstanceNormalization})
-# print(model.summary())
-
-# img = cv2.imread("test.jpeg")
-# img = tf.reshape(img, [1, 256, 256, 3])
-# prediction = model(img, training=False)[0].numpy() # make predition
-# prediction = (prediction * 127.5 + 127.5).astype(np.uint8)   # re-scale
-# im = PIL.Image.fromarray(prediction)
-# im.save("output.jpg")
+pyplot.axis("off")
+pyplot.savefig('output.jpg', bbox_inches='tight', pad_inches=0)
 
 app = Flask(__name__)
 
