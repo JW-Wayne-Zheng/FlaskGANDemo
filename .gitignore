@@ -182,4 +182,3 @@ pyvenv.cfg
 pip-selfcheck.json
 
 # End of https://www.toptal.com/developers/gitignore/api/venv
-Flask-env/share/man/man1/ttx.1
