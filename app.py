@@ -1,10 +1,11 @@
+from contextlib import redirect_stderr
 from numpy import load
 from numpy import expand_dims
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.preprocessing.image import load_img
 from matplotlib import pyplot
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, request
 from tensorflow.keras.models import load_model
 import tensorflow_addons as tfa
 from bs4 import BeautifulSoup
@@ -44,7 +45,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+	return render_template("index.html")
+
+@app.route('/about')
+def about():
+	return render_template("about.html")
 
 if __name__=="__main__":
     app.run(debug=True)
