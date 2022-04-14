@@ -29,9 +29,29 @@
     </div>
   </nav>
   <main>
-    
     <h1 class="h1 mt-5 pt-3">CIS4496-GANs-Project</h1>
-
+    <h2 class="h2">Project Description</h2>
+    <p>Our project is titled “I am Something of a Painter Myself,”
+      it is a GAN(generative adversarial network) related competition conducted on Kaggle.
+      A GAN allows you to imitate the unique color choices and brushstrokes employed by
+      renowned artists such as Monet. The goal of this competition is to create a GAN that
+      will output images in the style of a Monet to trick classifiers into believing that it is a
+      true Monet, not a generated one. The better quality your images can mimic a Monet, the lower
+      your MiFID (Memorization-informed Fréchet Inception Distance) and the higher you will move
+      up in the leaderboard.
+    </p>
+    <h2 class="" h2>Model</h2>
+    <div class="container-lg">
+      <img src="static/style/Phase3HighLevelView.svg" class="img-fluid" alt="CycleGAN">
+    </div>
+    <p>The modeling algorithm used for our project was a specific type of GAN, the cycleGAN. The cycleGAN specializes in
+      image-to-image translation which is how we can convert a normal image into one resembling the styles of our
+      artists. The cycleGAN consists of a source and target domain. The source domain consists of non-painting images
+      and the target domain consists of paintings by the artists. The cycleGAN also consists of two generators and two
+      discriminators. One generator’s job is to take images from the source domain and turn them into the target domain.
+      The second generator does the opposite of the first domain. The discriminator takes in the real images from the
+      target domain and the generated images from the generator to predict if they are real or fake.
+    </p>
   </main>
   <footer class="container">
     <p>© Temple University</p>
