@@ -17,39 +17,46 @@ import numpy as np
 soup = BeautifulSoup("templates/index.html")
 
 # load an image to the preferred size
-def load_resize_image(filename, size=(256,256)):
-	# load and resize the image
-	pixels = load_img(filename, target_size=size)
-	# convert to numpy array
-	pixels = img_to_array(pixels)
-	# transform in a sample
-	pixels = expand_dims(pixels, 0)
-	# scale from [0,255] to [-1,1]
-	pixels = (pixels - 127.5) / 127.5
-	return pixels
- 
+
+
+def load_resize_image(filename, size=(256, 256)):
+    # load and resize the image
+    pixels = load_img(filename, target_size=size)
+    # convert to numpy array
+    pixels = img_to_array(pixels)
+    # transform in a sample
+    pixels = expand_dims(pixels, 0)
+    # scale from [0,255] to [-1,1]
+    pixels = (pixels - 127.5) / 127.5
+    return pixels
+
 # load the image
-image_src = load_resize_image('test.jpeg')
+# image_src = load_resize_image('test.jpeg')
 # load the model
-model_AtoB = load_model('models/monet_generator.h5')
+# model_AtoB = load_model('models/monet_generator.h5')
 # translate image
-image_tar = model_AtoB.predict(image_src)
+# image_tar = model_AtoB.predict(image_src)
 # scale from [-1,1] to [0,1]
-image_tar = (image_tar + 1) / 2.0
+# image_tar = (image_tar + 1) / 2.0
 # plot the translated image
-pyplot.imshow(image_tar[0])
-pyplot.axis("off")
-pyplot.savefig('output.jpg', bbox_inches='tight', pad_inches=0)
+# pyplot.imshow(image_tar[0])
+# pyplot.axis("off")
+# pyplot.savefig('output.jpg', bbox_inches='tight', pad_inches=0)
+
 
 app = Flask(__name__)
 
-@app.route('/')
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
+	if request.form.get('Convert') == 'Convert':
+		return render_template("index.html", name="Wayne")
 	return render_template("index.html")
+
 
 @app.route('/about')
 def about():
-	return render_template("about.html")
+    return render_template("about.html")
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run(debug=True)

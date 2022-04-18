@@ -42,7 +42,7 @@
           artists like
           Monet, Van Gogh, Picasso, and etc.
         </p>
-        <a class="btn btn-link" href="#">For more information, please click here.</a>
+        <a class="btn btn-link" href="{{ url_for('about') }}">For more information, please click here.</a>
       </div>
       <div class="product-device shadow-sm d-none d-md-block"></div>
       <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
@@ -64,15 +64,30 @@
           <li><a class="dropdown-item" onclick="showArtists(this)">Van Gogh</a></li>
           <li><a class="dropdown-item" onclick="showArtists(this)">Picasso</a></li>
         </ul>
-        <button class="btn btn-info mt-3">Convert</button>
+        <form method="post" action="/">
+          <button type="submit" value="Convert" class="btn btn-info mt-3">Convert</button>
+        </form>
       </div>
     </div>
-    <div class="card" style="width: 18rem;">
-      <img id="frame" src="" class="card-img-top img-fluid">
-      <div class="card-body">
-        <p id="frametext" class="card-text"></p>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="card" style="width: 18rem;">
+          <img id="frame" src="" class="card-img-top img-fluid">
+          <div class="card-body">
+            <p id="frametext" class="card-text"></p>
+          </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <img id="frame2" src="" class="card-img-top img-fluid">
+          <div class="card-body">
+            <p id="frametext" class="card-text"></p>
+          </div>
+        </div>
       </div>
     </div>
+    {% if name %}
+    {{name}} says:
+    {% endif %}
   </div>
   <footer class="container">
     <p>© Temple University</p>
