@@ -28,18 +28,6 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="{{ url_for('about') }}">About</a>
           </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-              data-bs-toggle="dropdown" aria-expanded="false">
-              Artists Styles
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <li><a class="dropdown-item" href="#">Monet</a></li>
-              <li><a class="dropdown-item" href="#">Picasso</a></li>
-              <li><a class="dropdown-item" href="#">Sisley</a></li>
-            </ul>
-          </li>
         </ul>
       </div>
     </div>
@@ -65,7 +53,17 @@
       <label for="Image" class="form-label">Upload your image here</label>
       <input class="form-control" type="file" id="formFile" onchange="preview()">
       <button onclick="clearImage()" class="btn btn-primary mt-3">Click here to clear</button>
-      <button onclick="classifyMyImg()" class="btn btn-primary mt-3">Classify me</button>
+      <button onclick="classifyMyImg()" class="btn btn-danger mt-3">Classify me</button>
+      <button class="btn btn-warning mt-3 dropdown-toggle" type="button" id="dropdownMenuButton1"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        Artists Style
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" onclick="showArtists(this)">Monet</a></li>
+        <li><a class="dropdown-item" onclick="showArtists(this)">Van Gogh</a></li>
+        <li><a class="dropdown-item" onclick="showArtists(this)">Picasso</a></li>
+      </ul>
+      <button class="btn btn-info mt-3">Convert</button>
     </div>
     <div class="card" style="width: 18rem;">
       <img id="frame" src="" class="card-img-top img-fluid">
@@ -88,6 +86,9 @@
           predictionText.innerText = JSON.stringify(predictions);
         });
       });
+    }
+    function showArtists(item) {
+      document.getElementById("dropdownMenuButton1").innerHTML = item.innerHTML;
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
