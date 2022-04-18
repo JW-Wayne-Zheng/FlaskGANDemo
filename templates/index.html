@@ -52,18 +52,20 @@
     <div class="mb-5">
       <label for="Image" class="form-label">Upload your image here</label>
       <input class="form-control" type="file" id="formFile" onchange="preview()">
-      <button onclick="clearImage()" class="btn btn-primary mt-3">Click here to clear</button>
-      <button onclick="classifyMyImg()" class="btn btn-danger mt-3">Classify me</button>
-      <button class="btn btn-warning mt-3 dropdown-toggle" type="button" id="dropdownMenuButton1"
-        data-bs-toggle="dropdown" aria-expanded="false">
-        Artists Style
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" onclick="showArtists(this)">Monet</a></li>
-        <li><a class="dropdown-item" onclick="showArtists(this)">Van Gogh</a></li>
-        <li><a class="dropdown-item" onclick="showArtists(this)">Picasso</a></li>
-      </ul>
-      <button class="btn btn-info mt-3">Convert</button>
+      <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+        <button onclick="clearImage()" class="btn btn-primary mt-3">Click here to clear</button>
+        <button onclick="classifyMyImg()" class="btn btn-danger mt-3">Classify me</button>
+        <button class="btn btn-warning mt-3 dropdown-toggle" type="button" id="dropdownMenuButton1"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          Artists Style
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li><a class="dropdown-item" onclick="showArtists(this)">Monet</a></li>
+          <li><a class="dropdown-item" onclick="showArtists(this)">Van Gogh</a></li>
+          <li><a class="dropdown-item" onclick="showArtists(this)">Picasso</a></li>
+        </ul>
+        <button class="btn btn-info mt-3">Convert</button>
+      </div>
     </div>
     <div class="card" style="width: 18rem;">
       <img id="frame" src="" class="card-img-top img-fluid">
