@@ -14,8 +14,6 @@ import tensorflow as tf
 import PIL
 import numpy as np
 
-soup = BeautifulSoup("templates/index.html")
-
 # load an image to the preferred size
 
 
@@ -49,9 +47,15 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-	if request.form.get('Convert') == 'Convert':
-		return render_template("index.html", name="Wayne")
-	return render_template("index.html")
+	if request.method == 'POST':
+		if request.form['Convert_btn'] == "Convert":
+			with open("templates/index.html") as fp:
+				soup = BeautifulSoup(fp, 'html.parser')
+			for a in soup.find_all('img'):
+				print("Found the URL:", a['src'])
+			return render_template("index.html")
+	else:
+		return render_template("index.html")
 
 
 @app.route('/about')
