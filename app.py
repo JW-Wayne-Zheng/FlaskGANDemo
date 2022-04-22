@@ -14,8 +14,6 @@ import tensorflow as tf
 import PIL
 import numpy as np
 
-# load an image to the preferred size
-
 
 def load_resize_image(filename, size=(256, 256)):
     # load and resize the image
@@ -29,9 +27,9 @@ def load_resize_image(filename, size=(256, 256)):
     return pixels
 
 # load the image
-# image_src = load_resize_image('test.jpeg')
+# image_src = load_resize_image('test.jpg')
 # load the model
-# model_AtoB = load_model('models/monet_generator.h5')
+# model_AtoB = load_model('models/vangogh_generator.h5')
 # translate image
 # image_tar = model_AtoB.predict(image_src)
 # scale from [-1,1] to [0,1]
