@@ -76,12 +76,26 @@
     <div class="container col-md-6">
       <div class="mb-5">
         <label for="Image" class="form-label">Upload your image here</label>
-        <input
-          class="form-control"
-          type="file"
-          id="formFile"
-          onchange="preview()"
-        />
+        <form method="Post" action="/" enctype="multipart/form-data">
+          <input
+            class="form-control"
+            type="file"
+            name="file"
+            id="formFile"
+          />
+          <input type="Submit" value="Submit">
+        </form>
+        <p>
+          {% with messages = get_flashed_messages() %}
+	          {% if messages %}
+		        <ul>
+		        {% for message in messages %}
+		          <li>{{ message }}</li>
+		        {% endfor %}
+		        </ul>
+	          {% endif %}
+	        {% endwith %}
+        </p>
         <div
           class="btn-group"
           role="group"
@@ -114,8 +128,13 @@
             </li>
           </ul>
         </div>
-        <form method="post" action="/">
-          <button type="submit" value="Convert" class="btn btn-info mt-3" name="Convert_btn">
+        <form>
+          <button
+            type="submit"
+            value="Convert"
+            class="btn btn-info mt-3"
+            name="Convert_btn"
+          >
             Convert
           </button>
         </form>
@@ -123,10 +142,12 @@
       <div class="container-fluid">
         <div class="row">
           <div class="card" style="width: 18rem">
-            <img id="frame" src="" class="card-img-top img-fluid" />
-            <div class="card-body">
-              <p id="frametext" class="card-text"></p>
-            </div>
+            {% if filename %}
+              <img id="frame" src="{{ url_for('display_image', filename=filename) }}" class="card-img-top img-fluid" />
+              <div class="card-body">
+                <p id="frametext" class="card-text"></p>
+              </div>
+            {% endif %}
           </div>
           <div class="card" style="width: 18rem">
             <img id="frame2" src="" class="card-img-top img-fluid" />
