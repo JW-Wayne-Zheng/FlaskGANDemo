@@ -1,3 +1,4 @@
+import sys
 import os
 from contextlib import redirect_stderr
 from grpc import secure_channel
@@ -17,57 +18,45 @@ import PIL
 import numpy as np
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-
-def allowed_file(filename):
-	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def load_resize_image(filename, size=(256, 256)):
-    # load and resize the image
-    pixels = load_img(filename, target_size=size)
-    # convert to numpy array
-    pixels = img_to_array(pixels)
-    # transform in a sample
-    pixels = expand_dims(pixels, 0)
-    # scale from [0,255] to [-1,1]
-    pixels = (pixels - 127.5) / 127.5
-    return pixels
-
-# load the image
-# image_src = load_resize_image('test.jpg')
-# load the model
-# model_AtoB = load_model('models/vangogh_generator.h5')
-# translate image
-# image_tar = model_AtoB.predict(image_src)
-# scale from [-1,1] to [0,1]
-# image_tar = (image_tar + 1) / 2.0
-# plot the translated image
-# pyplot.imshow(image_tar[0])
-# pyplot.axis("off")
-# pyplot.savefig('output.jpg', bbox_inches='tight', pad_inches=0)
-
 
 app = Flask(__name__)
 app.secret_key = "AzplDmi6jA"
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+model_AtoB = load_model('models/monet_generator.h5')
+targetFile= "static/uploads/test.jpg"
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def load_resize_image(filename, size=(256, 256)):
+    pixels = load_img(filename, target_size=size)
+    pixels = img_to_array(pixels)
+    pixels = expand_dims(pixels, 0)
+    pixels = (pixels - 127.5) / 127.5
+    return pixels
+
 
 @app.route('/')
 def index():
-	if request.method == 'POST':
-		if request.form['Convert_btn'] == "Convert":
-			with open("templates/index.html") as fp:
-				soup = BeautifulSoup(fp, 'html.parser')
-			for a in soup.find_all('img'):
-				print("Found the URL:", a['src'])
-			return render_template("index.html")
-	else:
-		return render_template("index.html")
+    return render_template("index.html")
 
 
 @app.route('/about')
 def about():
     return render_template("about.html")
 
-@app.route('/', methods=["POST"])
+@app.route("/convert", methods=["POST"])
+def convert_image():
+    image_src = load_resize_image(targetFile)
+    image_tar = model_AtoB.predict(image_src)
+    image_tar = (image_tar + 1) / 2.0
+    pyplot.imshow(image_tar[0])
+    pyplot.axis("off")
+    pyplot.savefig('output.jpg', bbox_inches='tight', pad_inches=0)
+    return render_template("index.html")
+
+@app.route('/upload', methods=["POST"])
 def upload_image():
     if "file" not in request.files:
         flash("No file part")
@@ -88,6 +77,12 @@ def upload_image():
 @app.route("/display/<filename>")
 def display_image(filename):
     return redirect(url_for("static", filename="uploads/"+filename), code=301)
+
+
+@app.route("/display/<gfilename>")
+def display_generated_image(gfilename):
+    return redirect(url_for("static", gfilename="generated/"+gfilename), code=301)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
