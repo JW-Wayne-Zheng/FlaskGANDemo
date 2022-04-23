@@ -23,7 +23,7 @@ app = Flask(__name__)
 app.secret_key = "AzplDmi6jA"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 model_AtoB = load_model('models/monet_generator.h5')
-targetFile= "static/uploads/test.jpg"
+uploadFile= ""
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -48,13 +48,13 @@ def about():
 
 @app.route("/convert", methods=["POST"])
 def convert_image():
-    image_src = load_resize_image(targetFile)
+    image_src = load_resize_image("static/uploads/"+uploadFile)
     image_tar = model_AtoB.predict(image_src)
     image_tar = (image_tar + 1) / 2.0
     pyplot.imshow(image_tar[0])
     pyplot.axis("off")
-    pyplot.savefig('output.jpg', bbox_inches='tight', pad_inches=0)
-    return render_template("index.html")
+    pyplot.savefig('static/generated/'+uploadFile, bbox_inches='tight', pad_inches=0)
+    return render_template("index.html", filename="static/uploads/"+uploadFile ,gfilename="static/generated/"+uploadFile)
 
 @app.route('/upload', methods=["POST"])
 def upload_image():
@@ -67,6 +67,8 @@ def upload_image():
         return redirect(request.url)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
+        global uploadFile 
+        uploadFile = filename
         file.save(os.path.join("static/uploads/", filename))
         flash("Image successfully uploaded and displayed below")
         return render_template("index.html", filename=filename)
@@ -74,12 +76,12 @@ def upload_image():
         flash("Allowed image types are: png, jpg and jpeg")
         return redirect(request.url)
 
-@app.route("/display/<filename>")
+@app.route("/<filename>")
 def display_image(filename):
     return redirect(url_for("static", filename="uploads/"+filename), code=301)
 
 
-@app.route("/display/<gfilename>")
+@app.route("/<gfilename>")
 def display_generated_image(gfilename):
     return redirect(url_for("static", gfilename="generated/"+gfilename), code=301)
 
