@@ -10,11 +10,13 @@
       integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
       crossorigin="anonymous"
     />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="static/script/upload.js"></script>
     <!-- Load TensorFlow.js. This is required to use MobileNet. -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.1"></script>
     <!-- Load the MobileNet model. -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"></script>
+    <script src="static/script/colorHistogram.js"></script>
     <title>CIS4496 GAN Project Dashboard</title>
   </head>
 
@@ -81,10 +83,14 @@
             class="form-control"
             type="file"
             name="file"
-            id="formFile"
+            id="imageFile"
           />
           <input type="Submit" value="Submit" name="submitImgBtn" value="submitimgbtn">
         </form>
+        <button id="red" class="focuser btn btn-primary mt-3">++R</button>
+        <button id="green" class="focuser btn btn-primary mt-3">++G</button>
+        <button id="blue" class="focuser btn btn-primary mt-3">++B</button>
+        <button id="blend" class="focuser btn btn-primary mt-3">Blend</button>
         <p>
           {% with messages = get_flashed_messages() %}
 	          {% if messages %}
@@ -101,9 +107,6 @@
           role="group"
           aria-label="Button group with nested dropdown"
         >
-          <button onclick="clearImage()" class="btn btn-primary mt-3">
-            Click here to clear
-          </button>
           <button onclick="classifyMyImg()" class="btn btn-danger mt-3">
             Classify me
           </button>
@@ -127,34 +130,39 @@
               <a class="dropdown-item" onclick="showArtists(this)">Picasso</a>
             </li>
           </ul>
+          <form method="post" action="/convert">
+            <input
+              type="submit"
+              value="Convert"
+              class="btn btn-info mt-3"
+              name="Convert_btn"
+            >
+          </form>
         </div>
-        <form method="post" action="/convert">
-          <input
-            type="submit"
-            value="Convert"
-            class="btn btn-info mt-3"
-            name="Convert_btn"
-          >
-        </form>
+        
       </div>
-      <div class="container-fluid">
-        <div class="row">
-          <div class="card" style="width: 18rem">
-            {% if filename %}
-              <img id="frame" src="{{ url_for('display_image', filename=filename) }}" class="card-img-top img-fluid" />
-              <div class="card-body">
-                <p id="frametext" class="card-text"></p>
-              </div>
-            {% endif %}
-          </div>
-          <div class="card" style="width: 18rem">
-            {% if gfilename %}
-              <img id="frame2" src="{{ url_for('display_generated_image', gfilename=gfilename) }}" class="card-img-top img-fluid" />
-              <div class="card-body">
-                <p id="frametext" class="card-text"></p>
-              </div>
-            {% endif %}
-          </div>
+    </div>
+    <div class="container">
+      <div class="row" style="width: 80rem">
+        <div class="card" style="width: 40rem">
+          {% if filename %}
+            <img id="frame" src="{{ url_for('display_image', filename=filename) }}" class="card-img-top img-fluid" />
+            <div class="card-body">
+              <p id="frametext" class="card-text"></p>
+            </div>
+            <h2 class="display-4 fw-normal" id="pieChartTitle"></h2>
+            <svg id="pieChart" width="400" height="400"></svg>
+          {% endif %}
+          <canvas id="frame"></canvas>
+        </div>
+        <div class="card" style="width: 40rem">
+          {% if gfilename %}
+            <img id="frame2" src="{{ url_for('display_generated_image', gfilename=gfilename) }}" class="card-img-top img-fluid" />
+            <div class="card-body">
+              <p id="frametext" class="card-text"></p>
+            </div>
+          {% endif %}
+          <div id="row"><svg width="0.6" height="1"></svg></div>
         </div>
       </div>
     </div>
@@ -170,7 +178,47 @@
       mobilenet.load().then((model) => {
         //classify the image
         model.classify(img).then((predictions) => {
-          predictionText.innerText = JSON.stringify(predictions);
+          document.getElementById("pieChartTitle").innerText = "Image Type Probability";
+          var data = predictions;
+          var svg = d3.select("#pieChart"),
+            width = svg.attr("width"),
+            height = svg.attr("height"),
+            radius = 200;
+          
+          var ordScale = d3.scaleOrdinal()
+                            .domain(data)
+                            .range(['#ffd384','#94ebcd','#fbaccc','#d3e0ea','#fa7f72']);
+                            var pie = d3.pie().value(function(d) { 
+                return d.probability; 
+            });
+
+          var g = svg.append("g")
+                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+                   .attr("text-anchor", "middle")
+                   .style("font-size", "16px")
+          
+          var arc = g.selectAll("arc")
+                   .data(pie(data))
+                   .enter();
+                   var path = d3.arc()
+                     .outerRadius(radius)
+                     .innerRadius(0);
+
+          arc.append("path")
+           .attr("d", path)
+           .attr("fill", function(d) { return ordScale(d.data.className); });
+          
+          var label = d3.arc()
+                      .outerRadius(radius)
+                      .innerRadius(0);
+            
+          arc.append("text")
+           .attr("transform", function(d) { 
+                    return "translate(" + label.centroid(d) + ")"; 
+            })
+           .text(function(d) { return d.data.className; })
+           .style("font-family", "arial")
+           .style("font-size", 15);
         });
       });
     }
