@@ -2,7 +2,7 @@ let activeColor='red';
 let yAxis=false;
 
 function histogram(data) {
-  let W=640;
+  let W=500;
   let H=W/1.1;
   const svg = d3.select('svg');
   const margin = {top: 20, right: 20, bottom: 20, left: 20};
