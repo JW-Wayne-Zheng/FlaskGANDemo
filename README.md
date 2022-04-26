@@ -11,7 +11,9 @@ TensorFlow == 2.4
 TensorFlow_addons == 0.14
 ```
 1. Pull the repository locally and open it in any code editor that supports Python.
-2. Navigate to the root folder of the project then do ```Python app.py```, then you should be able to access the application on your localhost.
+2. Run ```pip install -r requirements.txt```
+3. Navigate to the root folder of the project then do ```python app.py```, then you should be able to access the application on your localhost.
+
 ## Hosting
 **Note:** This is only a beta release for testing, there could be bugs in the application to be resolved.
 
