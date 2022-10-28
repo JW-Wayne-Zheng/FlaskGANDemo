@@ -17,4 +17,4 @@ TensorFlow_addons == 0.14
 ## Hosting
 **Note:** This is only a beta release for testing, there could be bugs in the application to be resolved. The page could take some time to load, if your request is left with a "loading" indicator, please try to refresh the page again. The app is running on a free tier service, which could lead to some low performance issues.
 
-Heroku: https://salty-bastion-21751.herokuapp.com/
+Render: https://paintingganapp.onrender.com/
