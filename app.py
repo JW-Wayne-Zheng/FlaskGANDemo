@@ -11,7 +11,6 @@ from matplotlib import pyplot
 from flask import Flask, render_template, redirect, url_for, request, flash
 from tensorflow.keras.models import load_model
 import tensorflow_addons as tfa
-from bs4 import BeautifulSoup
 import cv2
 import tensorflow as tf
 import PIL

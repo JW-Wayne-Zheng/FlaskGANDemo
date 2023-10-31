@@ -1,4 +1,3 @@
-beautifulsoup4==4.11.1
 Flask==2.1.1
 grpcio==1.32.0
 matplotlib==3.5.1
