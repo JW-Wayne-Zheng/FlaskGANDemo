@@ -20,7 +20,10 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = "AzplDmi6jA"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-model_monet = load_model('models/monet_generator.h5')
+interpreter = tf.lite.Interpreter(model_path='/models/monet_generator.tflite')
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 uploadFile= ""
 
@@ -50,7 +53,10 @@ def convert_image():
     image_src = load_resize_image("static/uploads/"+uploadFile)
     artist = request.form.get('which_artists')
     image_tar = None
-    image_tar = model_monet.predict(image_src)
+    interpreter.set_tensor(input_details[0]['index'], image_src)
+    interpreter.invoke()
+    output_data = interpreter.get_tensor(output_details[0]['index'])
+    image_tar = output_data
     image_tar = (image_tar + 1) / 2.0
     pyplot.imshow(image_tar[0])
     pyplot.axis("off")
