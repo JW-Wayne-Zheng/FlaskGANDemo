@@ -18,3 +18,14 @@ TensorFlow_addons == 0.14
 **Note:** This is only a beta release for testing, there could be bugs in the application to be resolved. The page could take some time to load, if your request is left with a "loading" indicator, please try to refresh the page again. The app is running on a free tier service, which could lead to some low performance issues.
 
 Render: https://paintingganapp.onrender.com/
+
+### Module Requirement For Glitch
+**Note:** Make sure to include start.sh (python3 app.py)
+- Flask==2.1.1
+- grpcio==1.32.0
+- matplotlib==3.5.1
+- numpy==1.19.5
+- opencv-python-headless==4.2.0.32
+- Pillow==9.1.0
+- tensorflow-addons==0.14.0
+- Werkzeug==2.1.1
