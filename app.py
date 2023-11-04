@@ -54,6 +54,7 @@ def convert_image():
     image_src = load_resize_image("static/uploads/"+uploadFile)
     artist = request.form.get('which_artists')
     image_tar = None
+    print(f"Expected input shape: {input_details[0]['shape']}")
     interpreter.set_tensor(input_details[0]['index'], image_src)
     interpreter.invoke()
     output_data = interpreter.get_tensor(output_details[0]['index'])
