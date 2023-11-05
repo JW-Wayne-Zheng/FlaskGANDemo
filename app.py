@@ -37,6 +37,7 @@ def load_resize_image(filename, size=(256, 256)):
     pixels = img_to_array(pixels)
     pixels = expand_dims(pixels, 0)
     pixels = (pixels - 127.5) / 127.5
+    pixels = np.reshape(pixels, (1, 1, 1, 3))
     return pixels
 
 
