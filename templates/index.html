@@ -82,7 +82,7 @@
     >
       <div class="mb-0">
         <label for="Image" class="form-label ">Upload your image here</label>
-        <form method="post" action="/upload" enctype="multipart/form-data">
+        <form id="uploadForm" method="post" action="/upload" enctype="multipart/form-data">
           <input
             class="form-control"
             type="file"
@@ -220,4 +220,17 @@
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"
   ></script>
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        const fileInput = document.getElementById('imageFile');
+        const file = fileInput.files[0];
+        if (file) {
+            const fileType = file.type.toLowerCase();
+            if (fileType !== 'image/jpeg' && fileType !== 'image/png') {
+                alert('Only JPG and PNG files are allowed.');
+                event.preventDefault();  // Prevent the form from submitting
+            }
+        }
+    });
+</script>
 </html>

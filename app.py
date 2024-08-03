@@ -1,4 +1,3 @@
-import sys
 import os
 from contextlib import redirect_stderr
 from grpc import secure_channel
@@ -14,17 +13,23 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from tensorflow.keras.models import load_model
 import tensorflow_addons as tfa
 import tensorflow as tf
-import PIL
-import numpy as np
-from werkzeug.utils import secure_filename
-
+import unicodedata
+import re
 
 app = Flask(__name__)
 app.secret_key = "AzplDmi6jA"
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 model_monet = load_model('models/monet_generator.h5')
 
 uploadFile= ""
+
+def secure_unicode_filename(filename):
+    # Normalize the filename to NFC form, which composes characters into a consistent representation
+    filename = unicodedata.normalize('NFC', filename)
+    # Replace spaces and special characters (except non-English characters) with underscores
+    filename = re.sub(r'[^\w\s.-]', '', filename)  # Keep non-English characters, remove unsafe ones
+    filename = filename.strip().replace(' ', '_')  # Replace spaces with underscores
+    return filename
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -36,7 +41,6 @@ def load_resize_image(filename, size=(256, 256)):
     pixels = expand_dims(pixels, 0)
     pixels = (pixels - 127.5) / 127.5
     return pixels
-
 
 @app.route('/')
 def index():
@@ -63,21 +67,21 @@ def convert_image():
 def upload_image():
     if "file" not in request.files:
         flash("No file part")
-        return redirect(request.url)
+        return redirect(url_for('index'))
     file = request.files['file']
     if file.filename == "":
         flash("No image selected for uploading")
-        return redirect(request.url)
+        return redirect(url_for('index'))
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        filename = secure_unicode_filename(file.filename)
         global uploadFile 
         uploadFile = filename
         file.save(os.path.join("static/uploads/", filename))
         flash("Image successfully uploaded and displayed below")
         return render_template("index.html", filename=filename)
     else:
-        flash("Allowed image types are: png, jpg and jpeg")
-        return redirect(request.url)
+        flash("Allowed image types are: png, jpg, jpeg")
+        return redirect(url_for('index'))
 
 @app.route("/<filename>")
 def display_image(filename):
