@@ -92,7 +92,7 @@
             name="file"
             id="imageFile"
           />
-          <input class="btn btn-outline-success" type="Submit" value="Submit the image" name="submitImgBtn" value="submitimgbtn">
+          <input class="btn btn-outline-success" type="Submit" value="Submit image for further processing" name="submitImgBtn" value="submitimgbtn">
         </form>
         <p>
           {% with messages = get_flashed_messages() %}
@@ -110,54 +110,67 @@
           role="group"
           aria-label="Button group with nested dropdown"
         >
-          <button onclick="classifyMyImg()" class="btn btn-danger mt-3">
-            Classify me
-          </button>
-          <form method="post" action="/convert">
-            <select class="btn btn-warning mt-3" name="which_artists" aria-label="Default select example">
-              <option selected>Select the artists</option>
-              <option value="Monet">Monet</option>
-            </select>
-            <input
-              type="submit"
-              value="Convert"
-              class="btn btn-info mt-3"
-              name="Convert_btn"
-            >
-          </form>
+          {% if request.path == '/upload' or request.path == '/convert' %}
+            <button onclick="classifyMyImg()" class="btn btn-danger mt-3">
+              Classify me
+            </button>
+            <form method="post" action="/convert">
+              <select class="btn btn-warning mt-3" name="which_artists" aria-label="Default select example">
+                <option selected>Select the artists</option>
+                <option value="Monet">Monet</option>
+              </select>
+              <input
+                type="submit"
+                value="Convert"
+                class="btn btn-info mt-3"
+                name="Convert_btn"
+              >
+            </form>
+          {% endif %}
         </div>
-        <div class="container-fluid border border-secondary border-1 mt-3">
-          <h6 class="h6">Button Control Group for the Color Histogram</h6>
-          <div class="btn-group mb-3" role="group" aria-label="Mixed style control for the color histogram">
-            <button id="red" class="focuser btn btn-danger mt-3">++R</button>
-            <button id="green" class="focuser btn btn-success mt-3">++G</button>
-            <button id="blue" class="focuser btn btn-primary mt-3">++B</button>
-            <button id="blend" class="focuser btn btn-outline-primary mt-3">Blend</button>
+        {% if request.path == '/' %}
+          <div class="container-fluid border border-secondary border-1 mt-3">
+            <h6 class="h6">Button Control Group for the Color Histogram</h6>
+            <div class="btn-group mb-3" role="group" aria-label="Mixed style control for the color histogram">
+              <button id="red" class="focuser btn btn-danger mt-3">++R</button>
+              <button id="green" class="focuser btn btn-success mt-3">++G</button>
+              <button id="blue" class="focuser btn btn-primary mt-3">++B</button>
+              <button id="blend" class="focuser btn btn-outline-primary mt-3">Blend</button>
+            </div>
           </div>
-        </div>
+        {% endif %}
       </div>
     </div>
     <div class="container-fluid mt-1">
-      <div class="row mx-auto" style="width: 60rem">
-        <div class="card border-0" style="width: 30rem">
-          {% if filename %}
-            <img id="frame" src="{{ url_for('display_image', filename=filename) }}" class="card-img-top img-fluid" />
-            <div class="card-body">
-              <p id="frametext" class="card-text"></p>
-            </div>
-            <h2 class="display-4 fw-normal" id="pieChartTitle"></h2>
-            <svg id="pieChart" width="400" height="400"></svg>
-          {% endif %}
-          <canvas id="frame"></canvas>
+      <div class="row mx-auto">
+        <div class="col-12 col-md-6 mb-3">
+          <div class="card border-0">
+            {% if filename %}
+              <img id="frame" src="{{ url_for('display_image', filename=filename) }}" class="card-img-top img-fluid" />
+              <div class="card-body">
+                <p id="frametext" class="card-text"></p>
+              </div>
+              <h2 class="display-4 fw-normal" id="pieChartTitle"></h2>
+              <svg id="pieChart" width="400" height="400"></svg>
+            {% endif %}
+            <canvas id="frame"></canvas>
+          </div>
         </div>
-        <div class="card border-0" style="width: 30rem">
-          {% if gfilename %}
-            <img id="frame2" src="{{ url_for('display_generated_image', gfilename=gfilename) }}" class="card-img-top img-fluid" />
-            <div class="card-body">
-              <p id="frametext" class="card-text"></p>
+        <div class="col-12 col-md-6">
+          <div class="card border-0">
+            {% if gfilename %}
+              <img id="frame2" src="{{ url_for('display_generated_image', gfilename=gfilename) }}" class="card-img-top img-fluid" />
+              <div class="card-body">
+                <p id="frametext" class="card-text"></p>
+              </div>
+            {% endif %}
+            <div id="row">
+              <div id="loadingSpinner" class="spinner-border text-primary m-auto" role="status" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <svg width="0.6" height="1"></svg>
             </div>
-          {% endif %}
-          <div id="row"><svg width="0.6" height="1"></svg></div>
+          </div>
         </div>
       </div>
     </div>
@@ -169,54 +182,69 @@
     function classifyMyImg() {
       const img = document.getElementById("frame");
       const predictionText = document.getElementById("frametext");
-      //load the classification model
+      const classifyButton = document.querySelector("button[onclick='classifyMyImg()']");
+      const spinner = document.getElementById("loadingSpinner");
+
+      // Show the spinner and disable the button
+      spinner.style.display = "block";
+      classifyButton.disabled = true;
+
+      // Load the classification model
       mobilenet.load().then((model) => {
-        //classify the image
+        // Classify the image
         model.classify(img).then((predictions) => {
+          // Hide the spinner and re-enable the button
+          spinner.style.display = "none";
+          classifyButton.disabled = false;
+
           document.getElementById("pieChartTitle").innerText = "Image Type Probability";
           var data = predictions;
           var svg = d3.select("#pieChart"),
             width = svg.attr("width"),
             height = svg.attr("height"),
             radius = 200;
-          
+
           var ordScale = d3.scaleOrdinal()
-                            .domain(data)
-                            .range(['#ffd384','#94ebcd','#fbaccc','#d3e0ea','#fa7f72']);
-                            var pie = d3.pie().value(function(d) { 
-                return d.probability; 
-            });
+            .domain(data)
+            .range(['#ffd384', '#94ebcd', '#fbaccc', '#d3e0ea', '#fa7f72']);
+          var pie = d3.pie().value(function(d) {
+            return d.probability;
+          });
 
           var g = svg.append("g")
-                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-                   .attr("text-anchor", "middle")
-                   .style("font-size", "16px")
-          
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+
           var arc = g.selectAll("arc")
-                   .data(pie(data))
-                   .enter();
-                   var path = d3.arc()
-                     .outerRadius(radius)
-                     .innerRadius(0);
+            .data(pie(data))
+            .enter();
+          var path = d3.arc()
+            .outerRadius(radius)
+            .innerRadius(0);
 
           arc.append("path")
-           .attr("d", path)
-           .attr("fill", function(d) { return ordScale(d.data.className); });
-          
+            .attr("d", path)
+            .attr("fill", function(d) {
+              return ordScale(d.data.className);
+            });
+
           var label = d3.arc()
-                      .outerRadius(radius)
-                      .innerRadius(0);
-            
+            .outerRadius(radius)
+            .innerRadius(0);
+
           arc.append("text")
-           .attr("transform", function(d) { 
-                    return "translate(" + label.centroid(d) + ")"; 
+            .attr("transform", function(d) {
+              return "translate(" + label.centroid(d) + ")";
             })
-           .text(function(d) { return d.data.className; })
-           .style("font-family", "arial")
-           .style("font-size", 15);
+            .text(function(d) {
+              return d.data.className;
+            })
+            .style("font-family", "arial")
+            .style("font-size", 15);
         });
       });
-    }  
+    }
   </script>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
