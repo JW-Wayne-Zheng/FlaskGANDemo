@@ -23,7 +23,7 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">CIS4496 GAN Project</a>
+        <a class="navbar-brand" href="/">CIS4496 GAN Project</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -79,7 +79,7 @@
         ></div>
       </div>
     </main>
-    <div class="container-fluid" 
+    <div class="container-fluid mt-2" 
          style="background-image: url('static/style/artistic-rainbow-colors-splash-watercolor-background-vector.jpg');
                 background-size: cover;"
     >
@@ -92,7 +92,6 @@
             name="file"
             id="imageFile"
           />
-          <input class="btn btn-outline-success" type="Submit" value="Submit image for further processing" name="submitImgBtn" value="submitimgbtn">
         </form>
         <p>
           {% with messages = get_flashed_messages() %}
@@ -141,6 +140,7 @@
         {% endif %}
       </div>
     </div>
+    {% if filename or gfilename %}
     <div class="container-fluid mt-1">
       <div class="row mx-auto">
         <div class="col-12 col-md-6 mb-3">
@@ -174,6 +174,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
     <footer class="container">
       <p>© Temple University</p>
     </footer>
@@ -252,16 +253,19 @@
     crossorigin="anonymous"
   ></script>
   <script>
-    document.getElementById('uploadForm').addEventListener('submit', function(event) {
-        const fileInput = document.getElementById('imageFile');
-        const file = fileInput.files[0];
-        if (file) {
-            const fileType = file.type.toLowerCase();
-            if (fileType !== 'image/jpeg' && fileType !== 'image/png') {
-                alert('Only JPG and PNG files are allowed.');
-                event.preventDefault();  // Prevent the form from submitting
-            }
+    document.getElementById('imageFile').addEventListener('change', function() {
+      const fileInput = document.getElementById('imageFile');
+      const file = fileInput.files[0];
+      
+      if (file) {
+        const fileType = file.type.toLowerCase();
+        if (fileType !== 'image/jpeg' && fileType !== 'image/png') {
+          alert('Only JPG and PNG files are allowed.');
+          fileInput.value = ''; // Clear the file input
+        } else {
+          document.getElementById('uploadForm').submit(); // Submit the form if valid
         }
+      }
     });
-</script>
+  </script>
 </html>
