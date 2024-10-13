@@ -39,7 +39,7 @@ rsa==4.8
 six==1.15.0
 soupsieve==2.3.2
 tensorboard-plugin-wit==1.8.1
-tensorflow==2.11
+tensorflow-cpu==2.11
 tensorflow-addons==0.18.0
 termcolor==1.1.0
 toml==0.10.2
