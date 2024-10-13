@@ -23,7 +23,6 @@ model_monet = load_model('models/monet_generator.h5')
 model_degas = load_model('models/degas_generator.h5')
 model_picasso = load_model('models/picasso_generator.h5')
 model_rembrandt = load_model('models/rembrandt_generator.h5')
-model_sisley = load_model('models/sisley_generator.h5')
 model_vangogh = load_model('models/vangogh_generator.h5')
 
 uploadFile= ""
@@ -71,8 +70,6 @@ def convert_image():
         image_tar = model_picasso.predict(image_src)
     elif(artist == "Rembrandt"):
         image_tar = model_rembrandt.predict(image_src)
-    elif(artist == "Sisley"):
-        image_tar = model_sisley.predict(image_src)
     else:
         image_tar = model_monet.predict(image_src)
     image_tar = (image_tar + 1) / 2.0
