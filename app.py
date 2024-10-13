@@ -20,6 +20,11 @@ app = Flask(__name__)
 app.secret_key = "AzplDmi6jA"
 ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'png'])
 model_monet = load_model('models/monet_generator.h5')
+model_degas = load_model('models/degas_generator.h5')
+model_picasso = load_model('models/picasso_generator.h5')
+model_rembrandt = load_model('models/rembrandt_generator.h5')
+model_sisley = load_model('models/sisley_generator.h5')
+model_vangogh = load_model('models/vangogh_generator.h5')
 
 uploadFile= ""
 
@@ -56,7 +61,20 @@ def convert_image():
     image_src = load_resize_image("static/uploads/"+uploadFile)
     artist = request.form.get('which_artists')
     image_tar = None
-    image_tar = model_monet.predict(image_src)
+    if(artist == "Monet"):
+        image_tar = model_monet.predict(image_src)
+    elif(artist == "Van Gogh"):
+        image_tar = model_vangogh.predict(image_src)
+    elif(artist == "Degas"):
+        image_tar = model_degas.predict(image_src)
+    elif(artist == "Picasso"):
+        image_tar = model_picasso.predict(image_src)
+    elif(artist == "Rembrandt"):
+        image_tar = model_rembrandt.predict(image_src)
+    elif(artist == "Sisley"):
+        image_tar = model_sisley.predict(image_src)
+    else:
+        image_tar = model_monet.predict(image_src)
     image_tar = (image_tar + 1) / 2.0
     pyplot.imshow(image_tar[0])
     pyplot.axis("off")
