@@ -1,6 +1,7 @@
 import os
 import logging
 import numpy as np
+import requests
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from flask import current_app
@@ -24,6 +25,50 @@ class ModelService:
     def __init__(self):
         self.models = {}
         self.model_loaded = False
+        # Cloud storage URLs for model files
+        self.model_urls = {
+            'monet': 'https://drive.usercontent.google.com/uc?id=1q0fz1r6zrh2r3j1IjZVMQN3NrcwVkgXb&export=download',
+            'vangogh': 'https://drive.usercontent.google.com/uc?id=1hP2qKxGhjrtwvMbpbqXj9towUGWHUm_6&export=download',
+            'degas': 'https://drive.usercontent.google.com/uc?id=19JSuqF3u_UDrju2jq1AsBI9hSGV3yozx&export=download',
+            'picasso': 'https://drive.usercontent.google.com/uc?id=1a4PPlYBuaO8KaIYxDtz6JYv4vemkg-SM&export=download',
+            'rembrandt': 'https://drive.usercontent.google.com/uc?id=1Lo6H982WkOWN-VNuZV-xw5GrN6TdZ9Hv&export=download'
+        }
+    
+    def download_model(self, artist):
+        """Download model from cloud storage if not present locally"""
+        try:
+            models_dir = current_app.config['MODELS_FOLDER']
+            model_path = os.path.join(models_dir, f'{artist}_generator.h5')
+            
+            # If model already exists locally, skip download
+            if os.path.exists(model_path):
+                logger.info(f'Model for {artist} already exists locally')
+                return model_path
+            
+            # Create models directory if it doesn't exist
+            os.makedirs(models_dir, exist_ok=True)
+            
+            # Download model from cloud storage
+            if artist in self.model_urls:
+                url = self.model_urls[artist]
+                logger.info(f'Downloading {artist} model from {url}')
+                
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
+                
+                with open(model_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                
+                logger.info(f'Successfully downloaded {artist} model to {model_path}')
+                return model_path
+            else:
+                logger.warning(f'No download URL configured for {artist}')
+                return None
+                
+        except Exception as e:
+            logger.error(f'Error downloading {artist} model: {str(e)}')
+            return None
     
     def load_models(self):
         """Load all artist models on demand"""
@@ -36,6 +81,14 @@ class ModelService:
             
             for artist in artists:
                 model_path = os.path.join(models_dir, f'{artist}_generator.h5')
+                
+                # If model doesn't exist locally, try to download it
+                if not os.path.exists(model_path):
+                    model_path = self.download_model(artist)
+                    if not model_path:
+                        logger.warning(f'Could not download model for {artist}')
+                        continue
+                
                 if os.path.exists(model_path):
                     logger.info(f'Loading model for {artist}')
                     
