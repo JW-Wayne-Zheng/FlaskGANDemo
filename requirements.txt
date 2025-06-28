@@ -1,6 +1,6 @@
 Flask==3.0.0
 gunicorn==21.2.0
-tensorflow>=2.13.0,<2.16.0
+tensorflow-cpu>=2.13.0,<2.16.0
 tensorflow-addons>=0.18.0,<0.22.0
 Pillow>=10.0.0,<11.0.0
 numpy>=1.24.0,<2.0.0
