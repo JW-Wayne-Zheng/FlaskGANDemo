@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}ArtGAN - Transform Photos to Art{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="display-4 fw-bold text-gradient mb-4">
+                        Transform Photos into 
+                        <span class="text-primary">Artistic Masterpieces</span>
+                    </h1>
+                    <p class="lead mb-4">
+                        Using cutting-edge CycleGAN technology, convert your everyday photos into paintings 
+                        inspired by famous artists like Monet, Van Gogh, Picasso, and more.
+                    </p>
+                    <div class="d-flex gap-3 mb-4">
+                        <button class="btn btn-primary btn-lg" onclick="document.getElementById('imageUpload').click()">
+                            <i class="bi bi-upload me-2"></i>Upload Photo
+                        </button>
+                        <a href="{{ url_for('main.gallery') }}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-images me-2"></i>View Gallery
+                        </a>
+                    </div>
+                    
+                    <!-- Upload Form (Hidden) -->
+                    <form id="uploadForm" action="{{ url_for('main.upload_image') }}" method="post" enctype="multipart/form-data" class="d-none">
+                        <input type="file" id="imageUpload" name="file" accept="image/*" onchange="handleFileSelect(this)">
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="hero-visual">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="card shadow-sm">
+                                <img src="{{ url_for('static', filename='images/examples/original1.jpg') }}" 
+                                     class="card-img-top" alt="Original" style="height: 200px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-muted">Original Photo</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card shadow-sm border-primary">
+                                <img src="{{ url_for('static', filename='images/examples/monet1.jpg') }}" 
+                                     class="card-img-top" alt="Monet Style" style="height: 200px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-primary fw-bold">Monet Style</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card shadow-sm border-success">
+                                <img src="{{ url_for('static', filename='images/examples/vangogh1.jpg') }}" 
+                                     class="card-img-top" alt="Van Gogh Style" style="height: 200px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-success fw-bold">Van Gogh Style</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card shadow-sm border-warning">
+                                <img src="{{ url_for('static', filename='images/examples/picasso1.jpg') }}" 
+                                     class="card-img-top" alt="Picasso Style" style="height: 200px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-warning fw-bold">Picasso Style</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3 text-dark">How It Works</h2>
+                <p class="lead text-muted">Transform your photos in three simple steps</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="bi bi-cloud-upload"></i>
+                    </div>
+                    <h4>1. Upload Your Photo</h4>
+                    <p class="text-muted">Choose any photo from your device. We support JPG, PNG, and other common formats.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="bi bi-palette"></i>
+                    </div>
+                    <h4>2. Select Artist Style</h4>
+                    <p class="text-muted">Choose from famous artists like Monet, Van Gogh, Picasso, Degas, or Rembrandt.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card h-100">
+                    <div class="feature-icon">
+                        <i class="bi bi-magic"></i>
+                    </div>
+                    <h4>3. Get Your Artwork</h4>
+                    <p class="text-muted">Our AI transforms your photo into a beautiful artistic masterpiece in seconds.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Artist Styles Section -->
+<section class="artists-section py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-3">Available Artist Styles</h2>
+                <p class="lead text-muted">Choose from renowned artists throughout history</p>
+            </div>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            {% for artist in artists %}
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="artist-card text-center">
+                    <div class="artist-avatar">
+                        <img src="{{ url_for('static', filename='images/artists/' + artist + '.jpg') }}" 
+                             alt="{{ artist.title() }}" class="rounded-circle">
+                    </div>
+                    <h5 class="mt-3">{{ artist.title() }}</h5>
+                    <p class="text-muted small">
+                        {% if artist == 'monet' %}Impressionist master
+                        {% elif artist == 'vangogh' %}Post-impressionist
+                        {% elif artist == 'picasso' %}Cubist pioneer
+                        {% elif artist == 'degas' %}Ballet painter
+                        {% elif artist == 'rembrandt' %}Dutch master
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Recent Gallery Preview -->
+<section class="gallery-preview py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center mb-4">
+            <div class="col">
+                <h2 class="display-6 fw-bold text-dark">Your Recent Creations</h2>
+                <p class="text-muted">See your latest AI-generated artworks</p>
+            </div>
+            <div class="col-auto">
+                <a href="{{ url_for('main.gallery') }}" class="btn btn-outline-primary">
+                    View All <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div id="recentGallery" class="row g-3">
+            <!-- Gallery items will be loaded via JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section py-5">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="bi bi-images text-primary"></i>
+                    <h3 id="totalImages" class="fw-bold">-</h3>
+                    <p class="text-muted">Your Images</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="bi bi-palette text-success"></i>
+                    <h3 id="totalArtworks" class="fw-bold">-</h3>
+                    <p class="text-muted">Your Artworks</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="bi bi-people text-warning"></i>
+                    <h3 class="fw-bold">5</h3>
+                    <p class="text-muted">Artist Styles</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="bi bi-cpu text-info"></i>
+                    <h3 class="fw-bold">AI</h3>
+                    <p class="text-muted">Powered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load recent gallery and statistics
+document.addEventListener('DOMContentLoaded', function() {
+    loadRecentGallery();
+    loadStatistics();
+});
+
+function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+        showLoading('Uploading image...');
+        document.getElementById('uploadForm').submit();
+    }
+}
+
+function loadRecentGallery() {
+    fetch('/api/gallery/recent?limit=6')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const gallery = document.getElementById('recentGallery');
+                gallery.innerHTML = '';
+                
+                if (data.data.length === 0) {
+                    gallery.innerHTML = '<div class="col-12 text-center py-4"><p class="text-muted">You haven\'t created any artworks yet. Start creating amazing AI-generated art!</p></div>';
+                    return;
+                }
+                
+                data.data.forEach(image => {
+                    const col = document.createElement('div');
+                    col.className = 'col-lg-2 col-md-4 col-6';
+                    col.innerHTML = `
+                        <div class="card shadow-sm h-100">
+                            <img src="/generated/${image.filename}" class="card-img-top" 
+                                 style="height: 150px; object-fit: cover;" alt="${image.artist} style">
+                            <div class="card-body p-2">
+                                <small class="text-primary fw-bold">${image.artist.charAt(0).toUpperCase() + image.artist.slice(1)}</small>
+                            </div>
+                        </div>
+                    `;
+                    gallery.appendChild(col);
+                });
+            }
+        })
+        .catch(console.error);
+}
+
+function loadStatistics() {
+    fetch('/api/stats/storage')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('totalImages').textContent = data.data.uploads.file_count-1;
+                document.getElementById('totalArtworks').textContent = data.data.generated.file_count;
+            }
+        })
+        .catch(console.error);
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}Gallery - ArtGAN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-bold">
+                <i class="bi bi-images me-3"></i>Artwork Gallery
+            </h1>
+            <p class="lead text-muted">Discover amazing artworks created with ArtGAN</p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Create New Artwork
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filter Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <label class="form-label">Filter by Artist Style:</label>
+                            <select class="form-select" id="artistFilter" onchange="filterGallery()">
+                                <option value="">All Artists</option>
+                                <option value="monet">Monet</option>
+                                <option value="vangogh">Van Gogh</option>
+                                <option value="picasso">Picasso</option>
+                                <option value="degas">Degas</option>
+                                <option value="rembrandt">Rembrandt</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sort by:</label>
+                            <select class="form-select" id="sortBy" onchange="filterGallery()">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="artist">Artist Name</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">View:</label>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-primary active" onclick="changeView('grid')" id="gridView">
+                                    <i class="bi bi-grid-3x3"></i> Grid
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="changeView('list')" id="listView">
+                                    <i class="bi bi-list"></i> List
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <i class="bi bi-images display-6"></i>
+                            <h4 id="totalArtworks">{{ images|length }}</h4>
+                            <small>Your Artworks</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <i class="bi bi-palette display-6"></i>
+                            <h4 id="uniqueArtists">5</h4>
+                            <small>Artist Styles</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock display-6"></i>
+                            <h4 id="recentCount">-</h4>
+                            <small>Recent (24h)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body text-center">
+                            <i class="bi bi-star display-6"></i>
+                            <h4>AI</h4>
+                            <small>Powered</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gallery Content -->
+    <div class="row" id="galleryContainer">
+        {% if images %}
+        {% for image in images %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 gallery-item" 
+             data-artist="{{ 'monet' if '_monet' in image else 'vangogh' if '_vangogh' in image else 'picasso' if '_picasso' in image else 'degas' if '_degas' in image else 'rembrandt' if '_rembrandt' in image else 'unknown' }}"
+             data-filename="{{ image }}">
+            <div class="card shadow-sm h-100 artwork-card">
+                <div class="card-img-container">
+                    <img src="{{ url_for('main.generated_file', filename=image) }}" 
+                         class="card-img-top artwork-image" 
+                         alt="Artwork" 
+                         loading="lazy"
+                         data-lightbox-src="{{ url_for('main.generated_file', filename=image) }}"
+                         data-filename="{{ image }}"
+                         style="cursor: pointer;">
+                    <div class="card-img-overlay d-flex align-items-end">
+                        <div class="artist-badge">
+                            <span class="badge bg-dark bg-opacity-75">
+                                {% if '_monet' in image %}Monet
+                                {% elif '_vangogh' in image %}Van Gogh
+                                {% elif '_picasso' in image %}Picasso
+                                {% elif '_degas' in image %}Degas
+                                {% elif '_rembrandt' in image %}Rembrandt
+                                {% else %}Unknown
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <h6 class="card-title mb-2">{{ image }}</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar me-1"></i>
+                            <span class="creation-date" data-filename="{{ image }}">Loading...</span>
+                        </small>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary btn-sm download-btn" 
+                                    data-download-url="{{ url_for('main.generated_file', filename=image) }}"
+                                    data-filename="{{ image }}">
+                                <i class="bi bi-download"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm share-btn" 
+                                    data-filename="{{ image }}">
+                                <i class="bi bi-share"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="bi bi-images display-1 text-muted"></i>
+                <h3 class="mt-3">No Artworks in Your Session</h3>
+                <p class="text-muted">You haven't created any artworks in this session yet. Start creating amazing AI-generated art!</p>
+                <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Create Your First Artwork
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Load More Button -->
+    {% if images|length >= 20 %}
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <button class="btn btn-outline-primary" onclick="loadMoreArtworks()">
+                <i class="bi bi-arrow-down me-2"></i>Load More Artworks
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Lightbox Modal -->
+<div class="modal fade" id="lightboxModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 text-center">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" 
+                        data-bs-dismiss="modal" style="z-index: 1060;"></button>
+                <img id="lightboxImage" class="img-fluid rounded" alt="Artwork">
+                <div class="mt-3">
+                    <h5 id="lightboxTitle" class="text-white"></h5>
+                    <div class="btn-group">
+                        <button class="btn btn-light" onclick="downloadCurrentLightbox()">
+                            <i class="bi bi-download me-2"></i>Download
+                        </button>
+                        <button class="btn btn-outline-light" onclick="shareCurrentLightbox()">
+                            <i class="bi bi-share me-2"></i>Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentLightboxImage = '';
+let currentViewMode = 'grid';
+let allArtworks = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadArtworkDates();
+    loadGalleryStats();
+    initializeInfiniteScroll();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Image lightbox click handlers
+    document.querySelectorAll('.artwork-image').forEach(img => {
+        img.addEventListener('click', function() {
+            openLightbox(this.dataset.lightboxSrc, this.dataset.filename);
+        });
+    });
+    
+    // Download button handlers
+    document.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            downloadArtwork(this.dataset.downloadUrl, this.dataset.filename);
+        });
+    });
+    
+    // Share button handlers
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            shareArtwork(this.dataset.filename);
+        });
+    });
+}
+
+function loadArtworkDates() {
+    // Load creation dates for artworks via API
+    const dateElements = document.querySelectorAll('.creation-date');
+    dateElements.forEach(element => {
+        const filename = element.dataset.filename;
+        fetch(`/api/gallery/recent?limit=100`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const artwork = data.data.find(item => item.filename === filename);
+                    if (artwork) {
+                        const date = new Date(artwork.created * 1000);
+                        element.textContent = date.toLocaleDateString();
+                    } else {
+                        element.textContent = 'Unknown';
+                    }
+                }
+            })
+            .catch(() => {
+                element.textContent = 'Unknown';
+            });
+    });
+}
+
+function loadGalleryStats() {
+    fetch('/api/gallery/recent?limit=100')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                allArtworks = data.data;
+                
+                // Count recent artworks (last 24 hours)
+                const oneDayAgo = Date.now() / 1000 - 86400;
+                const recentCount = data.data.filter(item => item.created > oneDayAgo).length;
+                document.getElementById('recentCount').textContent = recentCount;
+            }
+        })
+        .catch(console.error);
+}
+
+function filterGallery() {
+    const artistFilter = document.getElementById('artistFilter').value;
+    const sortBy = document.getElementById('sortBy').value;
+    const items = document.querySelectorAll('.gallery-item');
+    
+    // Filter by artist
+    items.forEach(item => {
+        const artist = item.dataset.artist;
+        if (!artistFilter || artist === artistFilter) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // Sort items
+    const container = document.getElementById('galleryContainer');
+    const visibleItems = Array.from(items).filter(item => item.style.display !== 'none');
+    
+    if (sortBy === 'artist') {
+        visibleItems.sort((a, b) => a.dataset.artist.localeCompare(b.dataset.artist));
+    } else if (sortBy === 'newest') {
+        // Default order (newest first)
+    } else if (sortBy === 'oldest') {
+        visibleItems.reverse();
+    }
+    
+    // Reorder DOM elements
+    visibleItems.forEach(item => container.appendChild(item));
+}
+
+function changeView(mode) {
+    currentViewMode = mode;
+    const container = document.getElementById('galleryContainer');
+    const items = document.querySelectorAll('.gallery-item');
+    
+    // Update button states
+    document.getElementById('gridView').classList.remove('active');
+    document.getElementById('listView').classList.remove('active');
+    document.getElementById(mode + 'View').classList.add('active');
+    
+    if (mode === 'grid') {
+        items.forEach(item => {
+            item.className = 'col-lg-3 col-md-4 col-sm-6 mb-4 gallery-item';
+        });
+    } else {
+        items.forEach(item => {
+            item.className = 'col-12 mb-3 gallery-item';
+        });
+    }
+}
+
+function openLightbox(imageSrc, filename) {
+    currentLightboxImage = imageSrc;
+    document.getElementById('lightboxImage').src = imageSrc;
+    document.getElementById('lightboxTitle').textContent = filename;
+    
+    const modal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+    modal.show();
+}
+
+function downloadArtwork(url, filename) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+}
+
+function downloadCurrentLightbox() {
+    if (currentLightboxImage) {
+        const filename = document.getElementById('lightboxTitle').textContent;
+        downloadArtwork(currentLightboxImage, filename);
+    }
+}
+
+function shareArtwork(filename) {
+    const url = `${window.location.origin}/generated/${filename}`;
+    if (navigator.share) {
+        navigator.share({
+            title: 'ArtGAN Artwork',
+            text: 'Check out this AI-generated artwork!',
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Artwork link copied to clipboard!');
+        });
+    }
+}
+
+function shareCurrentLightbox() {
+    const filename = document.getElementById('lightboxTitle').textContent;
+    shareArtwork(filename);
+}
+
+function loadMoreArtworks() {
+    // Placeholder for pagination
+    alert('Load more functionality would be implemented here');
+}
+
+function initializeInfiniteScroll() {
+    // Optional: Implement infinite scroll
+    window.addEventListener('scroll', () => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000) {
+            // Load more content when near bottom
+            // loadMoreArtworks();
+        }
+    });
+}
+</script>
+{% endblock %} 
