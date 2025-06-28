@@ -15,6 +15,7 @@ Transform your photos into artistic masterpieces using cutting-edge CycleGAN tec
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Python 3.11.6** - Modern Python runtime
 - **Flask 3.0.0** - Lightweight web framework
 - **TensorFlow 2.15.0** - ML model inference
@@ -23,12 +24,14 @@ Transform your photos into artistic masterpieces using cutting-edge CycleGAN tec
 - **Matplotlib 3.8.2** - Visualization
 
 ### Frontend
+
 - **Bootstrap 5.3.2** - Modern CSS framework
 - **D3.js 7.0** - Data visualization
 - **TensorFlow.js 4.15.0** - Client-side AI
 - **Modern JavaScript** - ES6+ features
 
 ### Infrastructure
+
 - **Heroku** - Cloud deployment
 - **Gunicorn** - Production WSGI server
 
@@ -66,12 +69,14 @@ app/
 ### Local Development
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd FlaskGANDemo
    ```
 
 2. **Set up Python environment**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -79,6 +84,7 @@ app/
    ```
 
 3. **Run the application**
+
    ```bash
    python main.py
    ```
@@ -89,11 +95,13 @@ app/
 ### Heroku Deployment
 
 The application is configured for Heroku deployment with:
+
 - `Procfile` - Gunicorn configuration
 - `runtime.txt` - Python version specification
 - `requirements.txt` - Dependencies
 
 Deploy with:
+
 ```bash
 git push heroku main
 ```
@@ -121,6 +129,7 @@ Each model file (~31MB) contains a complete generator network trained on artist-
 ## 🔧 API Endpoints
 
 ### Core Endpoints
+
 - `GET /` - Homepage
 - `POST /upload` - Image upload
 - `GET /process/<filename>` - Image processing interface
@@ -128,6 +137,7 @@ Each model file (~31MB) contains a complete generator network trained on artist-
 - `GET /gallery` - Artwork gallery
 
 ### API Endpoints
+
 - `GET /api/models/info` - Model information
 - `GET /api/gallery/recent` - Recent artworks
 - `GET /api/stats/storage` - Storage statistics
@@ -136,18 +146,21 @@ Each model file (~31MB) contains a complete generator network trained on artist-
 ## 🎨 Features in Detail
 
 ### Color Analysis
+
 - RGB histogram visualization
 - Dominant color extraction
 - Statistical color analysis
 - Interactive D3.js charts
 
 ### Image Processing
+
 - Automatic image resizing
 - Format standardization
 - EXIF data preservation
 - Secure file handling
 
 ### Gallery Management
+
 - Artwork filtering by artist
 - Multiple view modes
 - Lightbox image viewing
@@ -181,10 +194,12 @@ Each model file (~31MB) contains a complete generator network trained on artist-
 ### Common Issues
 
 1. **Model Loading Errors**
+
    - Ensure model files exist in `models/` directory
    - Check file permissions and size
 
 2. **Memory Issues**
+
    - Reduce image size before upload
    - Monitor system memory usage
 
@@ -197,18 +212,3 @@ Each model file (~31MB) contains a complete generator network trained on artist-
 - Enable debug mode: `export FLASK_DEBUG=1`
 - View logs: Check console output
 - API testing: Use `/api/health` endpoint
-
-## 📄 License
-
-This project is part of Temple University CIS 4496 coursework. Model weights and training methodology based on CycleGAN research.
-
-## 🙏 Acknowledgments
-
-- **CycleGAN Paper**: Unpaired Image-to-Image Translation
-- **Kaggle Competition**: "I am Something of a Painter Myself"
-- **TensorFlow Team**: Model architecture and tools
-- **Bootstrap Team**: UI framework
-
----
-
-**Temple University - CIS 4496 Projects in Data Science**
