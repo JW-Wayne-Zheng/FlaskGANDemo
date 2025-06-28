@@ -207,17 +207,29 @@ def health_check():
     try:
         # Check if models are loaded
         available_artists = model_service.get_available_artists()
+        model_status = model_service.get_status()
         
         health_data = {
             'status': 'healthy',
             'models_loaded': len(available_artists),
             'available_artists': available_artists,
             'upload_folder_exists': os.path.exists(current_app.config['UPLOAD_FOLDER']),
-            'generated_folder_exists': os.path.exists(current_app.config['GENERATED_FOLDER'])
+            'generated_folder_exists': os.path.exists(current_app.config['GENERATED_FOLDER']),
+            'model_status': model_status
         }
         
         return api_response(health_data)
         
     except Exception as e:
         logger.error(f'Health check failed: {str(e)}')
-        return api_response(error='Health check failed', status=500) 
+        return api_response(error='Health check failed', status=500)
+
+@bp.route('/models/status')
+def models_status():
+    """Get current model loading status"""
+    try:
+        status = model_service.get_status()
+        return api_response(status)
+    except Exception as e:
+        logger.error(f'Error getting model status: {str(e)}')
+        return api_response(error='Failed to get model status', status=500) 

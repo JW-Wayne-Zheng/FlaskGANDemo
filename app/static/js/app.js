@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeTooltips();
     initializeImagePreview();
     initializeFormValidation();
+    startModelStatusCheck();
 });
 
 // Tooltips
@@ -288,6 +289,137 @@ function registerServiceWorker() {
                 });
         });
     }
+}
+
+// Model loading status management
+let modelStatusInterval = null;
+
+function checkModelStatus() {
+    fetch('/api/models/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateModelLoadingUI(data.data);
+            }
+        })
+        .catch(error => {
+            console.error('Error checking model status:', error);
+        });
+}
+
+function updateModelLoadingUI(status) {
+    const overlay = document.getElementById('modelLoadingOverlay');
+    const title = document.getElementById('modelLoadingTitle');
+    const message = document.getElementById('modelLoadingMessage');
+    const progressBar = document.getElementById('modelProgressBar');
+    const currentArtist = document.getElementById('currentArtist');
+    const loadedCount = document.getElementById('loadedCount');
+    
+    // Update homepage status indicator
+    const statusIndicator = document.getElementById('modelStatusIndicator');
+    const statusText = document.getElementById('modelStatusText');
+    
+    if (status.is_loading) {
+        // Show loading overlay
+        if (overlay) overlay.classList.remove('d-none');
+        
+        // Show homepage status indicator
+        if (statusIndicator) {
+            statusIndicator.classList.remove('d-none');
+            statusIndicator.className = 'alert alert-info d-flex align-items-center mb-4';
+        }
+        
+        // Update content
+        if (title) title.textContent = 'Loading AI Models...';
+        if (message) message.textContent = status.message;
+        if (statusText) statusText.textContent = status.message;
+        
+        // Update progress bar
+        if (progressBar) {
+            const progress = Math.round(status.progress);
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+        
+        // Update status details
+        if (currentArtist && status.current_artist) {
+            currentArtist.textContent = `Current: ${status.current_artist.charAt(0).toUpperCase() + status.current_artist.slice(1)}`;
+        }
+        if (loadedCount) {
+            loadedCount.textContent = `Loaded: ${status.loaded_models}/${status.total_models} models`;
+        }
+        
+    } else {
+        // Hide loading overlay
+        if (overlay) overlay.classList.add('d-none');
+        
+        // Update homepage status indicator
+        if (statusIndicator) {
+            if (status.message.includes('Ready')) {
+                statusIndicator.className = 'alert alert-success d-flex align-items-center mb-4';
+                if (statusText) statusText.textContent = 'AI Models ready! You can now upload photos.';
+            } else {
+                statusIndicator.classList.add('d-none');
+            }
+        }
+        
+        // Stop checking status
+        if (modelStatusInterval) {
+            clearInterval(modelStatusInterval);
+            modelStatusInterval = null;
+        }
+        
+        // Show success message briefly
+        if (status.message.includes('Ready')) {
+            showToast('AI Models loaded successfully!', 'success');
+        }
+    }
+}
+
+function startModelStatusCheck() {
+    // Check immediately
+    checkModelStatus();
+    
+    // Then check every 2 seconds
+    modelStatusInterval = setInterval(checkModelStatus, 2000);
+}
+
+function showToast(message, type = 'info') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toastContainer';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    // Create toast element
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto">ArtGAN</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    // Show toast
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', function() {
+        toastElement.remove();
+    });
 }
 
 // Export functions for use in other scripts

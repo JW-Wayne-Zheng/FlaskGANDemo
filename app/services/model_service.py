@@ -25,6 +25,14 @@ class ModelService:
     def __init__(self):
         self.models = {}
         self.model_loaded = False
+        self.loading_status = {
+            'is_loading': False,
+            'current_artist': None,
+            'progress': 0,
+            'total_models': 5,
+            'loaded_models': 0,
+            'message': 'Ready'
+        }
         # Cloud storage URLs for model files
         self.model_urls = {
             'monet': 'https://drive.usercontent.google.com/uc?id=1q0fz1r6zrh2r3j1IjZVMQN3NrcwVkgXb&export=download',
@@ -33,6 +41,14 @@ class ModelService:
             'picasso': 'https://drive.usercontent.google.com/uc?id=1a4PPlYBuaO8KaIYxDtz6JYv4vemkg-SM&export=download',
             'rembrandt': 'https://drive.usercontent.google.com/uc?id=1Lo6H982WkOWN-VNuZV-xw5GrN6TdZ9Hv&export=download'
         }
+    
+    def get_status(self):
+        """Get current loading status"""
+        return self.loading_status.copy()
+    
+    def update_status(self, **kwargs):
+        """Update loading status"""
+        self.loading_status.update(kwargs)
     
     def download_model(self, artist):
         """Download model from cloud storage if not present locally"""
@@ -53,12 +69,28 @@ class ModelService:
                 url = self.model_urls[artist]
                 logger.info(f'Downloading {artist} model from {url}')
                 
+                self.update_status(
+                    current_artist=artist,
+                    message=f'Downloading {artist.title()} model...'
+                )
+                
                 response = requests.get(url, stream=True)
                 response.raise_for_status()
                 
+                # Get file size for progress tracking
+                total_size = int(response.headers.get('content-length', 0))
+                downloaded_size = 0
+                
                 with open(model_path, 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192):
-                        f.write(chunk)
+                        if chunk:
+                            f.write(chunk)
+                            downloaded_size += len(chunk)
+                            
+                            # Update progress if we know total size
+                            if total_size > 0:
+                                progress = (downloaded_size / total_size) * 100
+                                self.update_status(progress=progress)
                 
                 logger.info(f'Successfully downloaded {artist} model to {model_path}')
                 return model_path
@@ -76,11 +108,26 @@ class ModelService:
             return
             
         try:
+            self.update_status(
+                is_loading=True,
+                progress=0,
+                loaded_models=0,
+                message='Starting model initialization...'
+            )
+            
             models_dir = current_app.config['MODELS_FOLDER']
             artists = current_app.config['ARTISTS']
             
-            for artist in artists:
+            for i, artist in enumerate(artists):
                 model_path = os.path.join(models_dir, f'{artist}_generator.h5')
+                
+                # Update progress
+                progress = (i / len(artists)) * 100
+                self.update_status(
+                    current_artist=artist,
+                    progress=progress,
+                    message=f'Processing {artist.title()} model...'
+                )
                 
                 # If model doesn't exist locally, try to download it
                 if not os.path.exists(model_path):
@@ -91,6 +138,10 @@ class ModelService:
                 
                 if os.path.exists(model_path):
                     logger.info(f'Loading model for {artist}')
+                    
+                    self.update_status(
+                        message=f'Loading {artist.title()} model into memory...'
+                    )
                     
                     # Load model with custom objects for TensorFlow Addons
                     custom_objects = {}
@@ -105,14 +156,25 @@ class ModelService:
                         compile=False, 
                         custom_objects=custom_objects
                     )
+                    
+                    self.loading_status['loaded_models'] += 1
                     logger.info(f'Successfully loaded {artist} model')
                 else:
                     logger.warning(f'Model file not found: {model_path}')
             
             self.model_loaded = True
+            self.update_status(
+                is_loading=False,
+                progress=100,
+                message=f'Ready! {len(self.models)} models loaded successfully'
+            )
             logger.info(f'Loaded {len(self.models)} models')
             
         except Exception as e:
+            self.update_status(
+                is_loading=False,
+                message=f'Error loading models: {str(e)}'
+            )
             logger.error(f'Error loading models: {str(e)}')
             raise
     

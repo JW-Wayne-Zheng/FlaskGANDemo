@@ -26,6 +26,16 @@
                         </a>
                     </div>
                     
+                    <!-- Model Status Indicator -->
+                    <div id="modelStatusIndicator" class="alert alert-info d-none mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm me-2" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span id="modelStatusText">Initializing AI models...</span>
+                        </div>
+                    </div>
+                    
                     <!-- Upload Form (Hidden) -->
                     <form id="uploadForm" action="{{ url_for('main.upload_image') }}" method="post" enctype="multipart/form-data" class="d-none">
                         <input type="file" id="imageUpload" name="file" accept="image/*" onchange="handleFileSelect(this)">
