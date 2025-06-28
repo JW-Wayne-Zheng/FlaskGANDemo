@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Process Image - ArtGAN{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Back Button -->
+        <div class="col-12 mb-3">
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+        
+        <!-- Image Display -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-image me-2"></i>Your Image</h5>
+                </div>
+                <div class="card-body p-0">
+                    <img id="uploadedImage" src="{{ url_for('main.uploaded_file', filename=filename) }}" 
+                         class="img-fluid w-100" alt="Uploaded image">
+                </div>
+                <div class="card-footer">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <small class="text-muted">Size</small>
+                            <div class="fw-bold">{{ metadata.width }}×{{ metadata.height }}</div>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">Format</small>
+                            <div class="fw-bold">{{ metadata.format }}</div>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">File Size</small>
+                            <div class="fw-bold">{{ "%.1f"|format(metadata.file_size/1024) }} KB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image Classification -->
+            <div class="card shadow mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-cpu me-2"></i>AI Image Classification</h6>
+                </div>
+                <div class="card-body">
+                    <button id="classifyBtn" class="btn btn-primary">
+                        <i class="bi bi-search me-2"></i>Classify Image
+                    </button>
+                    <div id="classificationResult" class="mt-3 d-none">
+                        <h6>Predictions:</h6>
+                        <div id="predictions"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controls and Analysis -->
+        <div class="col-lg-6">
+            <!-- Artist Selection -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-palette me-2"></i>Transform to Art</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">Choose an artist style to transform your image:</p>
+                    
+                    <form action="{{ url_for('main.convert_image') }}" method="post" id="convertForm">
+                        <input type="hidden" name="filename" value="{{ filename }}">
+                        
+                        <div class="row g-3 mb-4">
+                            {% for artist in artists %}
+                            <div class="col-md-6">
+                                <div class="artist-option">
+                                    <input type="radio" name="artist" value="{{ artist }}" id="artist_{{ artist }}" class="artist-radio d-none">
+                                    <label for="artist_{{ artist }}" class="artist-label card h-100">
+                                        <div class="card-body text-center p-3">
+                                            <img src="{{ url_for('static', filename='images/artists/' + artist + '.jpg') }}" 
+                                                 alt="{{ artist.title() }}" class="rounded-circle mb-2" style="width: 60px; height: 60px; object-fit: cover;">
+                                            <h6 class="mb-1">{{ artist.title() }}</h6>
+                                            <small class="text-muted">
+                                                {% if artist == 'monet' %}Impressionist
+                                                {% elif artist == 'vangogh' %}Post-impressionist
+                                                {% elif artist == 'picasso' %}Cubist
+                                                {% elif artist == 'degas' %}Ballet painter
+                                                {% elif artist == 'rembrandt' %}Dutch master
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-lg w-100" id="convertBtn" disabled>
+                            <i class="bi bi-magic me-2"></i>Generate Artwork
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Color Analysis -->
+            <div class="card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Color Analysis</h6>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-danger btn-sm color-channel-btn" data-channel="red">R</button>
+                        <button type="button" class="btn btn-outline-success btn-sm color-channel-btn" data-channel="green">G</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm color-channel-btn" data-channel="blue">B</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm active color-channel-btn" data-channel="all">All</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Color Statistics -->
+                    <div class="row mb-3">
+                        <div class="col-4 text-center">
+                            <div class="color-stat">
+                                <div class="color-badge bg-danger"></div>
+                                <small class="text-muted">Red Avg</small>
+                                <div class="fw-bold">{{ "%.0f"|format(color_analysis.red.mean) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="color-stat">
+                                <div class="color-badge bg-success"></div>
+                                <small class="text-muted">Green Avg</small>
+                                <div class="fw-bold">{{ "%.0f"|format(color_analysis.green.mean) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="color-stat">
+                                <div class="color-badge bg-primary"></div>
+                                <small class="text-muted">Blue Avg</small>
+                                <div class="fw-bold">{{ "%.0f"|format(color_analysis.blue.mean) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Histogram Chart -->
+                    <div id="histogramChart"></div>
+                    
+                    <!-- Dominant Colors -->
+                    {% if color_analysis.dominant_colors %}
+                    <div class="mt-3">
+                        <h6>Dominant Colors</h6>
+                        <div class="dominant-colors d-flex gap-2 flex-wrap">
+                            {% for color in color_analysis.dominant_colors[:5] %}
+                            <div class="dominant-color" title="{{ "%.1f"|format(color.percentage * 100) }}%">
+                                <div class="color-swatch" data-color="{{ color.hex }}"></div>
+                                <small class="text-muted">{{ "%.0f"|format(color.percentage * 100) }}%</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden canvas for image classification -->
+<canvas id="classificationCanvas" style="display: none;"></canvas>
+
+<!-- Color data for JavaScript -->
+<script type="application/json" id="colorData">{{ color_analysis | tojson | safe }}</script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Color analysis data
+const colorDataElement = document.getElementById('colorData');
+const colorData = colorDataElement ? JSON.parse(colorDataElement.textContent) : {};
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    initializeArtistSelection();
+    drawHistogram();
+    initializeDominantColors();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // Classify button
+    document.getElementById('classifyBtn').addEventListener('click', classifyImage);
+    
+    // Color channel buttons
+    document.querySelectorAll('.color-channel-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            showColorChannel(this.dataset.channel);
+        });
+    });
+}
+
+function initializeArtistSelection() {
+    const artistRadios = document.querySelectorAll('.artist-radio');
+    const convertBtn = document.getElementById('convertBtn');
+    
+    artistRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Update UI
+            document.querySelectorAll('.artist-label').forEach(label => {
+                label.classList.remove('selected');
+            });
+            this.nextElementSibling.classList.add('selected');
+            
+            // Enable convert button
+            convertBtn.disabled = false;
+        });
+    });
+    
+    // Handle form submission
+    document.getElementById('convertForm').addEventListener('submit', function(e) {
+        showLoading('Generating artwork...');
+    });
+}
+
+function drawHistogram() {
+    const container = document.getElementById('histogramChart');
+    container.innerHTML = '';
+    
+    const width = container.offsetWidth;
+    const height = 200;
+    const margin = {top: 10, right: 10, bottom: 20, left: 30};
+    
+    const svg = d3.select('#histogramChart')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+    
+    const g = svg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+    
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+    
+    const xScale = d3.scaleLinear()
+        .domain([0, 255])
+        .range([0, chartWidth]);
+    
+    const yScale = d3.scaleLinear()
+        .domain([0, d3.max([
+            ...colorData.red.histogram,
+            ...colorData.green.histogram,
+            ...colorData.blue.histogram
+        ])])
+        .range([chartHeight, 0]);
+    
+    // Draw histograms
+    drawColorHistogram(g, colorData.red.histogram, xScale, yScale, 'red', 0.7);
+    drawColorHistogram(g, colorData.green.histogram, xScale, yScale, 'green', 0.7);
+    drawColorHistogram(g, colorData.blue.histogram, xScale, yScale, 'blue', 0.7);
+    
+    // Add axes
+    g.append('g')
+        .attr('transform', `translate(0,${chartHeight})`)
+        .call(d3.axisBottom(xScale).ticks(5));
+    
+    g.append('g')
+        .call(d3.axisLeft(yScale).ticks(5));
+}
+
+function drawColorHistogram(g, data, xScale, yScale, color, opacity) {
+    const barWidth = xScale(1) - xScale(0);
+    
+    g.selectAll(`.bar-${color}`)
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('class', `bar-${color}`)
+        .attr('x', (d, i) => xScale(i))
+        .attr('y', d => yScale(d))
+        .attr('width', barWidth)
+        .attr('height', d => yScale(0) - yScale(d))
+        .attr('fill', color)
+        .attr('opacity', opacity);
+}
+
+function showColorChannel(channel) {
+    // Update button states
+    document.querySelectorAll('.color-channel-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-channel="${channel}"]`).classList.add('active');
+    
+    // Update histogram visibility
+    const allBars = document.querySelectorAll('#histogramChart rect');
+    
+    if (channel === 'all') {
+        allBars.forEach(bar => {
+            bar.style.opacity = '0.7';
+        });
+    } else {
+        allBars.forEach(bar => {
+            if (bar.classList.contains(`bar-${channel}`)) {
+                bar.style.opacity = '1';
+            } else {
+                bar.style.opacity = '0.1';
+            }
+        });
+    }
+}
+
+async function classifyImage() {
+    const btn = document.getElementById('classifyBtn');
+    const result = document.getElementById('classificationResult');
+    const predictions = document.getElementById('predictions');
+    
+    try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Classifying...';
+        
+        // Load MobileNet model
+        const model = await mobilenet.load();
+        
+        // Get image element
+        const img = document.getElementById('uploadedImage');
+        
+        // Classify image
+        const classificationResults = await model.classify(img);
+        
+        // Display results
+        predictions.innerHTML = '';
+        classificationResults.slice(0, 3).forEach((pred, index) => {
+            const confidence = (pred.probability * 100).toFixed(1);
+            predictions.innerHTML += `
+                <div class="prediction-item mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>${pred.className}</span>
+                        <span class="text-primary fw-bold">${confidence}%</span>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar" style="width: ${confidence}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        result.classList.remove('d-none');
+        
+    } catch (error) {
+        console.error('Classification error:', error);
+        predictions.innerHTML = '<div class="text-danger">Classification failed. Please try again.</div>';
+        result.classList.remove('d-none');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-search me-2"></i>Classify Image';
+    }
+}
+
+function initializeDominantColors() {
+    // Set background colors for dominant color swatches
+    document.querySelectorAll('.color-swatch[data-color]').forEach(swatch => {
+        swatch.style.backgroundColor = swatch.dataset.color;
+    });
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,424 @@
+/* Custom CSS for ArtGAN */
+
+/* Root variables for consistent theming */
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #6c757d;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+}
+
+/* Typography */
+.text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Navigation improvements */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Hero section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.hero-visual .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-visual .card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Feature cards */
+.feature-card {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 1rem;
+    background: white;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 2rem;
+}
+
+/* Artist cards */
+.artist-card {
+    transition: transform 0.3s ease;
+}
+
+.artist-card:hover {
+    transform: scale(1.05);
+}
+
+.artist-avatar img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    transition: border-color 0.3s ease;
+}
+
+.artist-card:hover .artist-avatar img {
+    border-color: var(--success-color);
+}
+
+/* Statistics section */
+.stat-card {
+    padding: 1.5rem;
+}
+
+.stat-card i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+/* Image processing styles */
+.artist-option {
+    cursor: pointer;
+}
+
+.artist-label {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.artist-label:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.artist-label.selected {
+    border-color: var(--success-color);
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+/* Color analysis */
+.color-stat {
+    text-align: center;
+}
+
+.color-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem;
+}
+
+#histogramChart {
+    min-height: 200px;
+}
+
+.dominant-colors {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.dominant-color {
+    text-align: center;
+    flex: 1;
+    min-width: 60px;
+}
+
+.color-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin: 0 auto 0.25rem;
+    border: 2px solid white;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Gallery styles */
+.artwork-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.artwork-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-img-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.artwork-image {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.artwork-card:hover .artwork-image {
+    transform: scale(1.1);
+}
+
+.artist-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+
+/* Before/After Slider */
+.before-after-slider {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+.before-after-slider .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: inset(0 50% 0 0);
+    transition: clip-path 0.1s ease;
+}
+
+.slider-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: var(--shadow);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    z-index: 10;
+}
+
+.slider-handle:active {
+    cursor: grabbing;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+/* Lightbox improvements */
+.modal-xl .modal-content {
+    background: transparent !important;
+}
+
+#lightboxImage {
+    max-height: 90vh;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+.slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .feature-card {
+        padding: 1.5rem;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .artwork-image {
+        height: 200px;
+    }
+    
+    .stat-card h3 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .display-5 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1rem;
+    }
+}
+
+/* Dark theme support */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #1a1a1a;
+    --bs-body-color: #ffffff;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: #2d2d2d;
+    border-color: #404040;
+}
+
+[data-bs-theme="dark"] .feature-card {
+    background-color: #2d2d2d;
+    color: white;
+}
+
+[data-bs-theme="dark"] .artist-label {
+    background-color: #2d2d2d;
+    border-color: #404040;
+}
+
+/* Custom button styles */
+.btn-gradient {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+    background: var(--gradient-secondary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    color: var(--dark-color);
+}
+
+/* Tooltip improvements */
+.tooltip {
+    font-size: 0.875rem;
+}
+
+/* Progress bars */
+.progress {
+    height: 6px;
+    border-radius: 3px;
+}
+
+.progress-bar {
+    border-radius: 3px;
+}
+
+/* Form improvements */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Alert improvements */
+.alert {
+    border: none;
+    border-radius: 0.75rem;
+}
+
+/* Badge improvements */
+.badge {
+    font-size: 0.75em;
+    border-radius: 0.5rem;
+} 

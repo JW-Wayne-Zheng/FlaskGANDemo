@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ArtGAN - Transform your photos into artistic masterpieces using AI">
+    <title>{% block title %}ArtGAN - AI Art Generator{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+    <!-- D3.js for data visualization -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- TensorFlow.js for client-side AI -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
+                <i class="bi bi-palette me-2"></i>ArtGAN
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}"
+                            href="{{ url_for('main.index') }}">
+                            <i class="bi bi-house me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.gallery' %}active{% endif %}"
+                            href="{{ url_for('main.gallery') }}">
+                            <i class="bi bi-images me-1"></i>Gallery
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}"
+                            href="{{ url_for('main.about') }}">
+                            <i class="bi bi-info-circle me-1"></i>About
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear me-1"></i>Settings
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" onclick="toggleTheme()">
+                                    <i class="bi bi-sun me-2"></i>Toggle Theme
+                                </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="/api/health" target="_blank">
+                                    <i class="bi bi-activity me-2"></i>System Status
+                                </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-5 pt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show"
+            role="alert">
+            <i
+                class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main content -->
+    <main class="pt-5">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-palette me-2"></i>ArtGAN</h5>
+                    <p class="text-muted">Transform your photos into artistic masterpieces using cutting-edge AI
+                        technology.</p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Technology</h6>
+                    <ul class="list-unstyled">
+                        <li><span class="text-light">TensorFlow</span></li>
+                        <li><span class="text-light">CycleGAN</span></li>
+                        <li><span class="text-light">Python Flask</span></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0 text-muted">&copy; 2024 Temple University CIS 4496</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0 text-muted">Powered by AI & Machine Learning</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay d-none">
+        <div class="loading-content">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h5>Processing your artwork...</h5>
+            <p class="text-muted">This may take a few moments</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

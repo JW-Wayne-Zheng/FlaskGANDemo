@@ -1,45 +1,214 @@
-# FlaskGANDemo
+# ArtGAN - AI Art Generator
 
-## General
+Transform your photos into artistic masterpieces using cutting-edge CycleGAN technology. Create stunning artworks in the style of famous artists like Monet, Van Gogh, Picasso, Degas, and Rembrandt.
 
-This is a web application that allows users to upload images and apply artists' style transformations to the images.
+## 🎨 Features
 
-**Note:** The information regarding the machine learning models used can be found [here](https://github.com/WayneJWZLemon/CIS4496-GANs-Project)
+- **Multiple Artist Styles**: Transform images using 5 different pre-trained GAN models
+- **Real-time Processing**: Fast image conversion with modern web technologies
+- **Interactive Gallery**: Browse and manage generated artworks
+- **Color Analysis**: Advanced color histogram visualization with D3.js
+- **AI Classification**: Client-side image classification using TensorFlow.js
+- **Modern UI**: Responsive design with Bootstrap 5 and custom CSS
+- **RESTful API**: Clean API endpoints for programmatic access
 
-## How to run it locally for development
+## 🛠️ Technology Stack
 
-> Notes: Because the model was trained on a specific Kaggle Notebook environment, it is preferred to run your local environment listed below. (We did not perform any testing on other version of Python and Tensorflow)
+### Backend
+- **Python 3.11.6** - Modern Python runtime
+- **Flask 3.0.0** - Lightweight web framework
+- **TensorFlow 2.15.0** - ML model inference
+- **Pillow 10.1.0** - Image processing
+- **NumPy 1.24.3** - Numerical computations
+- **Matplotlib 3.8.2** - Visualization
 
-```txt
-Python == 3.8
-TensorFlow == 2.4
-TensorFlow_addons == 0.14
+### Frontend
+- **Bootstrap 5.3.2** - Modern CSS framework
+- **D3.js 7.0** - Data visualization
+- **TensorFlow.js 4.15.0** - Client-side AI
+- **Modern JavaScript** - ES6+ features
+
+### Infrastructure
+- **Heroku** - Cloud deployment
+- **Gunicorn** - Production WSGI server
+
+## 🏗️ Architecture
+
+The application follows a modern Flask architecture with:
+
+```
+app/
+├── __init__.py              # Application factory
+├── config.py               # Configuration management
+├── blueprints/             # Route organization
+│   ├── main.py            # Main user routes
+│   └── api.py             # RESTful API endpoints
+├── services/              # Business logic
+│   ├── model_service.py   # GAN model operations
+│   └── image_service.py   # Image processing
+├── utils/                 # Helper functions
+│   └── file_utils.py      # File operations
+├── templates/             # Jinja2 templates
+│   ├── base.html         # Base template
+│   ├── index.html        # Homepage
+│   ├── process.html      # Image processing
+│   ├── result.html       # Results display
+│   ├── gallery.html      # Gallery view
+│   └── about.html        # Project information
+└── static/               # Static assets
+    ├── css/style.css     # Custom styling
+    ├── js/app.js         # JavaScript functionality
+    └── images/           # Image assets
 ```
 
-1. Pull the repository locally and open it in any code editor that supports Python.
-2. Run `pip install -r requirements.txt`
-3. Starting the application
+## 🚀 Quick Start
 
-- Navigate to the root folder of the project then do `python app.py`, then you should be able to access the application on your localhost.
-- To run the application in a production envrionment, use `gunicorn -w 4 app:app` to start the application
-  - `-w 4`: This flag tells Gunicorn to use 4 worker processes. You can adjust the number of workers based on your server's CPU cores.
-  - `app:app`: The first `app` is the filename (`app.py`), and the second `app` is the Flask application object inside that file.
+### Local Development
 
-## Hosting
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd FlaskGANDemo
+   ```
 
-**Note:** This is only a beta release for testing, there could be bugs in the application to be resolved. The page could take some time to load, if your request is left with a "loading" indicator, please try to refresh the page again. The app is running on a free tier service, which could lead to some low performance issues.
+2. **Set up Python environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-Heroku: <https://image-to-painting-converter-2c3c7ded7c80.herokuapp.com/>
+3. **Run the application**
+   ```bash
+   python main.py
+   ```
 
-### Module Requirement For Glitch
+4. **Access the application**
+   - Open http://localhost:5000 in your browser
 
-**Note:** Make sure to include start.sh (python3 app.py)
+### Heroku Deployment
 
-- Flask==2.1.1
-- grpcio==1.32.0
-- matplotlib==3.5.1
-- numpy==1.19.5
-- opencv-python-headless==4.2.0.32
-- Pillow==9.1.0
-- tensorflow-addons==0.14.0
-- Werkzeug==2.1.1
+The application is configured for Heroku deployment with:
+- `Procfile` - Gunicorn configuration
+- `runtime.txt` - Python version specification
+- `requirements.txt` - Dependencies
+
+Deploy with:
+```bash
+git push heroku main
+```
+
+## 📊 AI Models
+
+The application includes pre-trained CycleGAN models for:
+
+- **Monet** - Impressionist landscape style
+- **Van Gogh** - Post-impressionist with bold colors
+- **Picasso** - Cubist geometric abstractions
+- **Degas** - Classical figure painting
+- **Rembrandt** - Dutch Golden Age portraits
+
+Each model file (~31MB) contains a complete generator network trained on artist-specific datasets.
+
+## 🎯 Usage
+
+1. **Upload Image**: Select a photo using the file picker
+2. **Analyze**: View color histogram and AI classification
+3. **Transform**: Choose an artist style for conversion
+4. **Download**: Save your generated artwork
+5. **Gallery**: Browse all created artworks
+
+## 🔧 API Endpoints
+
+### Core Endpoints
+- `GET /` - Homepage
+- `POST /upload` - Image upload
+- `GET /process/<filename>` - Image processing interface
+- `POST /convert` - Style transfer
+- `GET /gallery` - Artwork gallery
+
+### API Endpoints
+- `GET /api/models/info` - Model information
+- `GET /api/gallery/recent` - Recent artworks
+- `GET /api/stats/storage` - Storage statistics
+- `GET /api/health` - Health check
+
+## 🎨 Features in Detail
+
+### Color Analysis
+- RGB histogram visualization
+- Dominant color extraction
+- Statistical color analysis
+- Interactive D3.js charts
+
+### Image Processing
+- Automatic image resizing
+- Format standardization
+- EXIF data preservation
+- Secure file handling
+
+### Gallery Management
+- Artwork filtering by artist
+- Multiple view modes
+- Lightbox image viewing
+- Social sharing capabilities
+
+## 🔒 Security Features
+
+- File type validation
+- File size limits (16MB)
+- Secure filename generation
+- Input sanitization
+- Error handling
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Touch-friendly interfaces
+- Adaptive image scaling
+- Progressive enhancement
+
+## 🌟 Advanced Features
+
+- **Before/After Slider**: Interactive image comparison
+- **Batch Processing**: Multiple image support (API)
+- **Theme Toggle**: Light/dark mode support
+- **Progressive Loading**: Lazy image loading
+- **Error Recovery**: Graceful error handling
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Model Loading Errors**
+   - Ensure model files exist in `models/` directory
+   - Check file permissions and size
+
+2. **Memory Issues**
+   - Reduce image size before upload
+   - Monitor system memory usage
+
+3. **Slow Processing**
+   - Use smaller input images
+   - Consider model optimization
+
+### Development
+
+- Enable debug mode: `export FLASK_DEBUG=1`
+- View logs: Check console output
+- API testing: Use `/api/health` endpoint
+
+## 📄 License
+
+This project is part of Temple University CIS 4496 coursework. Model weights and training methodology based on CycleGAN research.
+
+## 🙏 Acknowledgments
+
+- **CycleGAN Paper**: Unpaired Image-to-Image Translation
+- **Kaggle Competition**: "I am Something of a Painter Myself"
+- **TensorFlow Team**: Model architecture and tools
+- **Bootstrap Team**: UI framework
+
+---
+
+**Temple University - CIS 4496 Projects in Data Science**
