@@ -105,6 +105,13 @@ class ModelService:
     def load_models(self):
         """Load all artist models on demand"""
         if self.model_loaded:
+            # Models are already loaded, update status to reflect this
+            self.update_status(
+                is_loading=False,
+                progress=100,
+                loaded_models=len(self.models),
+                message=f'Ready! {len(self.models)} models loaded successfully'
+            )
             return
             
         try:

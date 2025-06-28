@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeImagePreview();
     initializeFormValidation();
     startModelStatusCheck();
+    successToastShown = false;
 });
 
 // Tooltips
@@ -293,6 +294,9 @@ function registerServiceWorker() {
 
 // Model loading status management
 let modelStatusInterval = null;
+let statusCheckStarted = false;
+let successToastShown = false;
+let wasLoading = false; // Track if we were actually loading
 
 function checkModelStatus() {
     fetch('/api/models/status')
@@ -315,16 +319,20 @@ function updateModelLoadingUI(status) {
     const currentArtist = document.getElementById('currentArtist');
     const loadedCount = document.getElementById('loadedCount');
     
-    // Update homepage status indicator
+    // Update homepage status indicator (only on homepage)
     const statusIndicator = document.getElementById('modelStatusIndicator');
     const statusText = document.getElementById('modelStatusText');
+    const isHomepage = window.location.pathname === '/' || window.location.pathname === '/index';
     
     if (status.is_loading) {
+        // Mark that we were loading
+        wasLoading = true;
+        
         // Show loading overlay
         if (overlay) overlay.classList.remove('d-none');
         
-        // Show homepage status indicator
-        if (statusIndicator) {
+        // Show homepage status indicator only on homepage
+        if (statusIndicator && isHomepage) {
             statusIndicator.classList.remove('d-none');
             statusIndicator.className = 'alert alert-info d-flex align-items-center mb-4';
         }
@@ -332,7 +340,7 @@ function updateModelLoadingUI(status) {
         // Update content
         if (title) title.textContent = 'Loading AI Models...';
         if (message) message.textContent = status.message;
-        if (statusText) statusText.textContent = status.message;
+        if (statusText && isHomepage) statusText.textContent = status.message;
         
         // Update progress bar
         if (progressBar) {
@@ -353,35 +361,76 @@ function updateModelLoadingUI(status) {
         // Hide loading overlay
         if (overlay) overlay.classList.add('d-none');
         
-        // Update homepage status indicator
-        if (statusIndicator) {
-            if (status.message.includes('Ready')) {
+        // Update homepage status indicator only on homepage
+        if (statusIndicator && isHomepage) {
+            if (status.message.includes('Ready') || status.loaded_models === status.total_models) {
                 statusIndicator.className = 'alert alert-success d-flex align-items-center mb-4';
                 if (statusText) statusText.textContent = 'AI Models ready! You can now upload photos.';
+                
+                // Remove spinner when ready
+                const spinner = statusIndicator.querySelector('.spinner-border');
+                if (spinner) {
+                    spinner.remove();
+                }
+                
+                // Add checkmark icon
+                if (!statusIndicator.querySelector('.bi-check-circle')) {
+                    const checkIcon = document.createElement('i');
+                    checkIcon.className = 'bi bi-check-circle me-2';
+                    statusIndicator.querySelector('.d-flex').insertBefore(checkIcon, statusIndicator.querySelector('.d-flex').firstChild);
+                }
+                
+                // Hide indicator after 5 seconds
+                setTimeout(() => {
+                    if (statusIndicator) {
+                        statusIndicator.classList.add('d-none');
+                    }
+                }, 5000);
+                
             } else {
                 statusIndicator.classList.add('d-none');
             }
         }
         
-        // Stop checking status
-        if (modelStatusInterval) {
-            clearInterval(modelStatusInterval);
-            modelStatusInterval = null;
-        }
-        
-        // Show success message briefly
-        if (status.message.includes('Ready')) {
-            showToast('AI Models loaded successfully!', 'success');
+        // Stop checking status when models are ready
+        if (status.message.includes('Ready') || status.loaded_models === status.total_models) {
+            if (modelStatusInterval) {
+                clearInterval(modelStatusInterval);
+                modelStatusInterval = null;
+            }
+            
+            // Show success message only if we were actually loading and haven't shown it yet
+            if (wasLoading && !successToastShown && status.loaded_models > 0) {
+                showToast('AI Models loaded successfully!', 'success');
+                successToastShown = true;
+            }
         }
     }
 }
 
 function startModelStatusCheck() {
+    // Don't start multiple intervals
+    if (statusCheckStarted) {
+        return;
+    }
+    
+    statusCheckStarted = true;
+    
     // Check immediately
     checkModelStatus();
     
     // Then check every 2 seconds
     modelStatusInterval = setInterval(checkModelStatus, 2000);
+}
+
+function resetModelStatusCheck() {
+    if (modelStatusInterval) {
+        clearInterval(modelStatusInterval);
+        modelStatusInterval = null;
+    }
+    statusCheckStarted = false;
+    successToastShown = false;
+    wasLoading = false;
 }
 
 function showToast(message, type = 'info') {
