@@ -1,12 +1,22 @@
 import os
 import logging
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_from_directory
+import uuid
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_from_directory, session
 from app.services.model_service import model_service
 from app.services.image_service import image_service
-from app.utils.file_utils import cleanup_old_files
+from app.utils.file_utils import cleanup_old_files, cleanup_old_sessions
 
 logger = logging.getLogger(__name__)
 bp = Blueprint('main', __name__)
+
+def get_session_folder():
+    """Get or create session-specific folder"""
+    if 'session_id' not in session:
+        session['session_id'] = str(uuid.uuid4())
+    
+    session_folder = os.path.join(current_app.config['GENERATED_FOLDER'], session['session_id'])
+    os.makedirs(session_folder, exist_ok=True)
+    return session_folder
 
 @bp.route('/')
 def index():
@@ -21,17 +31,17 @@ def about():
 
 @bp.route('/gallery')
 def gallery():
-    """Gallery of generated artworks"""
-    generated_dir = current_app.config['GENERATED_FOLDER']
+    """Gallery of generated artworks for current session only"""
+    session_folder = get_session_folder()
     images = []
     
-    if os.path.exists(generated_dir):
-        for filename in os.listdir(generated_dir):
+    if os.path.exists(session_folder):
+        for filename in os.listdir(session_folder):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
                 images.append(filename)
     
     # Sort by modification time (newest first)
-    images.sort(key=lambda x: os.path.getmtime(os.path.join(generated_dir, x)), reverse=True)
+    images.sort(key=lambda x: os.path.getmtime(os.path.join(session_folder, x)), reverse=True)
     
     return render_template('gallery.html', images=images[:20])  # Show last 20 images
 
@@ -60,7 +70,7 @@ def upload_image():
         
         # Clean up old files periodically
         cleanup_old_files(upload_folder, max_age_hours=24)
-        cleanup_old_files(current_app.config['GENERATED_FOLDER'], max_age_hours=24)
+        cleanup_old_sessions(current_app.config['GENERATED_FOLDER'], max_age_hours=24)
         
         flash('Image uploaded successfully!', 'success')
         return redirect(url_for('main.process_image', filename=filename))
@@ -118,10 +128,11 @@ def convert_image():
             flash('Original image not found', 'error')
             return redirect(url_for('main.index'))
         
-        # Generate output filename
+        # Generate output filename in session folder
         name, ext = os.path.splitext(filename)
         output_filename = f"{name}_{artist}{ext}"
-        output_path = os.path.join(current_app.config['GENERATED_FOLDER'], output_filename)
+        session_folder = get_session_folder()
+        output_path = os.path.join(session_folder, output_filename)
         
         # Generate artwork
         model_service.generate_artwork(input_path, artist, output_path)
@@ -150,10 +161,10 @@ def view_result():
     
     # Verify files exist
     upload_folder = current_app.config['UPLOAD_FOLDER']
-    generated_folder = current_app.config['GENERATED_FOLDER']
+    session_folder = get_session_folder()
     
     original_path = os.path.join(upload_folder, original)
-    generated_path = os.path.join(generated_folder, generated)
+    generated_path = os.path.join(session_folder, generated)
     
     if not os.path.exists(original_path) or not os.path.exists(generated_path):
         flash('Result files not found', 'error')
@@ -171,8 +182,9 @@ def uploaded_file(filename):
 
 @bp.route('/generated/<filename>')
 def generated_file(filename):
-    """Serve generated files"""
-    return send_from_directory(current_app.config['GENERATED_FOLDER'], filename)
+    """Serve generated files from session folder"""
+    session_folder = get_session_folder()
+    return send_from_directory(session_folder, filename)
 
 @bp.errorhandler(413)
 def too_large(e):

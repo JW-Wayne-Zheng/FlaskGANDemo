@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, session
 from app.services.model_service import model_service
 from app.services.image_service import image_service
 from app.utils.file_utils import get_directory_size, format_file_size
@@ -16,6 +16,14 @@ def api_response(data=None, error=None, status=200):
         'error': error
     }
     return jsonify(response), status
+
+def get_session_folder():
+    """Get or create session-specific folder"""
+    if 'session_id' not in session:
+        return None
+    
+    session_folder = os.path.join(current_app.config['GENERATED_FOLDER'], session['session_id'])
+    return session_folder if os.path.exists(session_folder) else None
 
 @bp.route('/models/info')
 def models_info():
@@ -113,19 +121,19 @@ def convert_image_api():
 
 @bp.route('/stats/storage')
 def storage_stats():
-    """Get storage usage statistics"""
+    """Get storage usage statistics for current session"""
     try:
         upload_folder = current_app.config['UPLOAD_FOLDER']
-        generated_folder = current_app.config['GENERATED_FOLDER']
+        session_folder = get_session_folder()
         
         upload_size = get_directory_size(upload_folder)
-        generated_size = get_directory_size(generated_folder)
+        generated_size = get_directory_size(session_folder) if session_folder else 0
         
         # Count files
         upload_files = len([f for f in os.listdir(upload_folder) 
                            if os.path.isfile(os.path.join(upload_folder, f))]) if os.path.exists(upload_folder) else 0
-        generated_files = len([f for f in os.listdir(generated_folder) 
-                              if os.path.isfile(os.path.join(generated_folder, f))]) if os.path.exists(generated_folder) else 0
+        generated_files = len([f for f in os.listdir(session_folder) 
+                              if os.path.isfile(os.path.join(session_folder, f))]) if session_folder else 0
         
         stats = {
             'uploads': {
@@ -153,19 +161,20 @@ def storage_stats():
 
 @bp.route('/gallery/recent')
 def recent_gallery():
-    """Get recent generated images"""
+    """Get recent generated images for current session only"""
     try:
         limit = request.args.get('limit', 10, type=int)
-        generated_folder = current_app.config['GENERATED_FOLDER']
         
-        if not os.path.exists(generated_folder):
+        # Get session folder
+        session_folder = get_session_folder()
+        if not session_folder:
             return api_response([])
         
         # Get image files with metadata
         images = []
-        for filename in os.listdir(generated_folder):
+        for filename in os.listdir(session_folder):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-                filepath = os.path.join(generated_folder, filename)
+                filepath = os.path.join(session_folder, filename)
                 stat = os.stat(filepath)
                 
                 # Extract artist from filename if possible

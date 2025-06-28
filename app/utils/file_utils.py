@@ -40,6 +40,47 @@ def cleanup_old_files(directory, max_age_hours=24):
     
     return files_deleted
 
+def cleanup_old_sessions(generated_folder, max_age_hours=24):
+    """Clean up old session folders"""
+    if not os.path.exists(generated_folder):
+        return 0
+    
+    current_time = datetime.now()
+    sessions_deleted = 0
+    
+    for session_id in os.listdir(generated_folder):
+        session_path = os.path.join(generated_folder, session_id)
+        
+        # Skip if not a directory or is a hidden file
+        if not os.path.isdir(session_path) or session_id.startswith('.'):
+            continue
+        
+        # Check if session folder is old
+        try:
+            # Use the oldest file in the session folder as the session age
+            oldest_time = None
+            for filename in os.listdir(session_path):
+                filepath = os.path.join(session_path, filename)
+                if os.path.isfile(filepath):
+                    file_time = datetime.fromtimestamp(os.path.getmtime(filepath))
+                    if oldest_time is None or file_time < oldest_time:
+                        oldest_time = file_time
+            
+            if oldest_time:
+                age_hours = (current_time - oldest_time).total_seconds() / 3600
+                
+                if age_hours > max_age_hours:
+                    try:
+                        shutil.rmtree(session_path)
+                        sessions_deleted += 1
+                    except OSError:
+                        pass
+        except Exception:
+            # If we can't determine age, skip this session
+            pass
+    
+    return sessions_deleted
+
 def get_directory_size(directory):
     """Get total size of directory in bytes"""
     total_size = 0
