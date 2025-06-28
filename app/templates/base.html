@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="auto">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -25,7 +25,7 @@
 
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">
                 <i class="bi bi-palette me-2"></i>ArtGAN
@@ -58,21 +58,10 @@
                 </ul>
 
                 <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-gear me-1"></i>Settings
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api/health" target="_blank">
+                            <i class="bi bi-activity me-1"></i>Status
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="toggleTheme()">
-                                    <i class="bi bi-sun me-2"></i>Toggle Theme
-                                </a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="/api/health" target="_blank">
-                                    <i class="bi bi-activity me-2"></i>System Status
-                                </a></li>
-                        </ul>
                     </li>
                 </ul>
             </div>
@@ -89,7 +78,7 @@
             <i
                 class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
         </div>
         {% endfor %}
     </div>
@@ -102,30 +91,30 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-light py-4 mt-5">
+    <footer class="bg-dark text-light py-4 mt-5 border-top border-secondary">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5><i class="bi bi-palette me-2"></i>ArtGAN</h5>
+                    <h5><i class="bi bi-palette me-2 text-primary"></i>ArtGAN</h5>
                     <p class="text-muted">Transform your photos into artistic masterpieces using cutting-edge AI
                         technology.</p>
                 </div>
                 <div class="col-md-6">
                     <h6>Technology</h6>
                     <ul class="list-unstyled">
-                        <li><span class="text-light">TensorFlow</span></li>
-                        <li><span class="text-light">CycleGAN</span></li>
-                        <li><span class="text-light">Python Flask</span></li>
+                        <li><span class="badge bg-primary me-2">TensorFlow</span></li>
+                        <li><span class="badge bg-success me-2">CycleGAN</span></li>
+                        <li><span class="badge bg-info me-2">Python Flask</span></li>
                     </ul>
                 </div>
             </div>
-            <hr class="mt-4">
+            <hr class="mt-4 border-secondary">
             <div class="row">
                 <div class="col-md-6">
-                    <p class="mb-0 text-muted">&copy; 2024 Temple University CIS 4496</p>
+                    <p class="mb-0 text-muted">&copy; 2022 Temple University CIS 4496</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <p class="mb-0 text-muted">Powered by AI & Machine Learning</p>
+                    <p class="mb-0 text-muted">Powered by machine learning models</p>
                 </div>
             </div>
         </div>

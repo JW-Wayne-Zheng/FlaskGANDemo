@@ -1,20 +1,33 @@
-/* Custom CSS for ArtGAN */
+/* Custom CSS for ArtGAN - Dark Theme */
 
-/* Root variables for consistent theming */
+/* Root variables for dark theme */
 :root {
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --success-color: #198754;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --info-color: #0dcaf0;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    --primary-color: #4dabf7;
+    --secondary-color: #868e96;
+    --success-color: #51cf66;
+    --warning-color: #ffd43b;
+    --danger-color: #ff6b6b;
+    --info-color: #74c0fc;
+    --light-color: #343a40;
+    --dark-color: #f8f9fa;
+    --bg-dark: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #adb5bd;
+    --text-muted: #6c757d;
+    --border-color: #495057;
+    --gradient-primary: linear-gradient(135deg, #4dabf7 0%, #339af0 100%);
+    --gradient-secondary: linear-gradient(135deg, #74c0fc 0%, #4dabf7 100%);
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.5);
+}
+
+/* Global dark theme styles */
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
 }
 
 /* Typography */
@@ -25,6 +38,10 @@
     background-clip: text;
 }
 
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
 /* Navigation improvements */
 .navbar-brand {
     font-size: 1.5rem;
@@ -33,7 +50,7 @@
 
 /* Hero section */
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1c2833 0%, #2c3e50 100%);
     color: white;
     min-height: 100vh;
     display: flex;
@@ -47,6 +64,9 @@
 }
 
 .hero-visual .card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -55,15 +75,33 @@
     box-shadow: var(--shadow-lg);
 }
 
+/* Cards and containers */
+.card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.card-header {
+    background-color: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-footer {
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
+}
+
 /* Feature cards */
 .feature-card {
     text-align: center;
     padding: 2rem;
     border-radius: 1rem;
-    background: white;
+    background: var(--bg-secondary);
     box-shadow: var(--shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .feature-card:hover {
@@ -86,6 +124,8 @@
 
 /* Artist cards */
 .artist-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     transition: transform 0.3s ease;
 }
 
@@ -108,6 +148,8 @@
 /* Statistics section */
 .stat-card {
     padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .stat-card i {
@@ -119,6 +161,7 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
+    color: var(--text-primary);
 }
 
 /* Image processing styles */
@@ -130,6 +173,8 @@
     transition: all 0.3s ease;
     cursor: pointer;
     border: 2px solid transparent;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
 }
 
 .artist-label:hover {
@@ -140,7 +185,7 @@
 
 .artist-label.selected {
     border-color: var(--success-color);
-    background-color: rgba(25, 135, 84, 0.1);
+    background-color: rgba(81, 207, 102, 0.2);
 }
 
 /* Color analysis */
@@ -157,6 +202,7 @@
 
 #histogramChart {
     min-height: 200px;
+    background-color: var(--bg-secondary);
 }
 
 .dominant-colors {
@@ -176,12 +222,14 @@
     height: 40px;
     border-radius: 50%;
     margin: 0 auto 0.25rem;
-    border: 2px solid white;
+    border: 2px solid var(--border-color);
     box-shadow: var(--shadow-sm);
 }
 
 /* Gallery styles */
 .artwork-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
 }
@@ -199,18 +247,19 @@
 .artwork-image {
     height: 250px;
     object-fit: cover;
+    width: 100%;
     transition: transform 0.3s ease;
-    cursor: pointer;
 }
 
 .artwork-card:hover .artwork-image {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .artist-badge {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
 }
 
 /* Before/After Slider */
@@ -218,38 +267,51 @@
     position: relative;
     overflow: hidden;
     border-radius: 0.5rem;
+    box-shadow: var(--shadow);
 }
 
 .before-after-slider .overlay {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 50%;
     height: 100%;
-    clip-path: inset(0 50% 0 0);
-    transition: clip-path 0.1s ease;
+    overflow: hidden;
+    z-index: 2;
 }
 
 .slider-handle {
     position: absolute;
+    top: 0;
+    left: 50%;
+    width: 4px;
+    height: 100%;
+    background: var(--primary-color);
+    cursor: ew-resize;
+    z-index: 3;
+    transform: translateX(-50%);
+    transition: background 0.3s ease;
+}
+
+.slider-handle::before {
+    content: '';
+    position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    background: white;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border: 2px solid white;
     border-radius: 50%;
-    box-shadow: var(--shadow);
-    cursor: grab;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    z-index: 10;
+    transform: translate(-50%, -50%);
+}
+
+.slider-handle:hover {
+    background: var(--success-color);
 }
 
 .slider-handle:active {
-    cursor: grabbing;
+    background: var(--warning-color);
 }
 
 /* Loading overlay */
@@ -259,7 +321,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(18, 18, 18, 0.9);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -268,32 +330,48 @@
 
 .loading-content {
     text-align: center;
-    color: white;
+    color: var(--text-primary);
 }
 
-/* Lightbox improvements */
+/* Modal dark theme */
+.modal-content {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
 .modal-xl .modal-content {
-    background: transparent !important;
+    max-height: 90vh;
 }
 
 #lightboxImage {
-    max-height: 90vh;
-    box-shadow: var(--shadow-lg);
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
 }
 
-/* Animation classes */
+/* Animations */
 .fade-in {
-    animation: fadeIn 0.6s ease-in-out;
+    animation: fadeIn 0.6s ease-in;
 }
 
 .slide-up {
-    animation: slideUp 0.6s ease-out;
+    animation: slideUp 0.8s ease-out;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -304,32 +382,33 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Responsive improvements */
+/* Responsive adjustments */
 @media (max-width: 768px) {
     .hero-content h1 {
         font-size: 2.5rem;
     }
-    
+
     .feature-card {
         padding: 1.5rem;
     }
-    
+
     .feature-icon {
         width: 60px;
         height: 60px;
         font-size: 1.5rem;
     }
-    
+
     .artwork-image {
         height: 200px;
     }
-    
+
     .stat-card h3 {
         font-size: 2rem;
     }
@@ -339,86 +418,139 @@
     .hero-content h1 {
         font-size: 2rem;
     }
-    
+
     .display-5 {
         font-size: 2rem;
     }
-    
+
     .lead {
         font-size: 1rem;
     }
 }
 
-/* Dark theme support */
-[data-bs-theme="dark"] {
-    --bs-body-bg: #1a1a1a;
-    --bs-body-color: #ffffff;
+/* Form controls dark theme */
+.form-control {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
-[data-bs-theme="dark"] .card {
-    background-color: #2d2d2d;
-    border-color: #404040;
+.form-control:focus {
+    background-color: var(--bg-tertiary);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+    color: var(--text-primary);
 }
 
-[data-bs-theme="dark"] .feature-card {
-    background-color: #2d2d2d;
-    color: white;
+.form-select {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
-[data-bs-theme="dark"] .artist-label {
-    background-color: #2d2d2d;
-    border-color: #404040;
+.form-select:focus {
+    background-color: var(--bg-tertiary);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+    color: var(--text-primary);
 }
 
-/* Custom button styles */
+/* Buttons */
 .btn-gradient {
     background: var(--gradient-primary);
     border: none;
     color: white;
-    transition: all 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-gradient:hover {
     background: var(--gradient-secondary);
     transform: translateY(-2px);
     box-shadow: var(--shadow);
-    color: var(--dark-color);
+    color: white;
 }
 
-/* Tooltip improvements */
+/* Tooltips */
 .tooltip {
     font-size: 0.875rem;
 }
 
 /* Progress bars */
 .progress {
-    height: 6px;
-    border-radius: 3px;
+    background-color: var(--bg-tertiary);
 }
 
 .progress-bar {
-    border-radius: 3px;
+    background: var(--gradient-primary);
 }
 
-/* Form improvements */
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-/* Alert improvements */
+/* Alerts dark theme */
 .alert {
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
 }
 
-/* Badge improvements */
+.alert-info {
+    background-color: rgba(116, 192, 252, 0.2);
+    color: var(--info-color);
+}
+
+.alert-success {
+    background-color: rgba(81, 207, 102, 0.2);
+    color: var(--success-color);
+}
+
+.alert-warning {
+    background-color: rgba(255, 212, 59, 0.2);
+    color: var(--warning-color);
+}
+
+.alert-danger {
+    background-color: rgba(255, 107, 107, 0.2);
+    color: var(--danger-color);
+}
+
+/* Badges */
 .badge {
-    font-size: 0.75em;
-    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+/* List groups */
+.list-group-item {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.list-group-item:hover {
+    background-color: var(--bg-tertiary);
+}
+
+/* Tables */
+.table-dark {
+    --bs-table-bg: var(--bg-secondary);
+    --bs-table-striped-bg: var(--bg-tertiary);
+    --bs-table-border-color: var(--border-color);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.dropdown-divider {
+    border-top: 1px solid var(--border-color);
 } 

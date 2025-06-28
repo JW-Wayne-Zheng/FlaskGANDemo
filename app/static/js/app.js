@@ -1,35 +1,11 @@
 // Main JavaScript file for ArtGAN
 
-// Global variables
-let currentTheme = localStorage.getItem('theme') || 'auto';
-
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
-    initializeTheme();
     initializeTooltips();
     initializeImagePreview();
     initializeFormValidation();
 });
-
-// Theme management
-function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'auto';
-    document.documentElement.setAttribute('data-bs-theme', savedTheme);
-    currentTheme = savedTheme;
-}
-
-function toggleTheme() {
-    const themes = ['light', 'dark', 'auto'];
-    const currentIndex = themes.indexOf(currentTheme);
-    const nextTheme = themes[(currentIndex + 1) % themes.length];
-    
-    document.documentElement.setAttribute('data-bs-theme', nextTheme);
-    localStorage.setItem('theme', nextTheme);
-    currentTheme = nextTheme;
-    
-    // Show notification
-    showNotification(`Theme changed to ${nextTheme}`, 'success');
-}
 
 // Tooltips
 function initializeTooltips() {
